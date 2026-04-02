@@ -1,0 +1,973 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chap2_4_LOD_Solution.m 逐行讲解</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --ink: #1f2a37;
+      --muted: #5b6675;
+      --line: #dde4ee;
+      --accent: #0f766e;
+      --accent-soft: #e6f8f6;
+      --warn: #c0392b;
+      --tag-model: #1d4ed8;
+      --tag-disc: #7c3aed;
+      --tag-local: #0e7490;
+      --tag-global: #0369a1;
+      --tag-solve: #166534;
+      --tag-post: #b45309;
+      --tag-plot: #be123c;
+      --tag-note: #475569;
+      --tag-sep: #334155;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: radial-gradient(circle at 0 0, #eef7ff 0, var(--bg) 48%);
+      color: var(--ink);
+      font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+      line-height: 1.55;
+    }
+    .wrap { max-width: 1360px; margin: 0 auto; padding: 20px; }
+    h1, h2, h3 { margin: 0 0 10px; }
+    h1 { font-size: 28px; }
+    h2 { font-size: 22px; margin-top: 26px; }
+    h3 { font-size: 18px; margin-top: 18px; }
+    .lead { color: var(--muted); margin: 8px 0 0; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+      margin-top: 14px;
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05);
+    }
+    .grid-2 { display: grid; grid-template-columns: 1.1fr 1fr; gap: 14px; }
+    .mini { color: var(--muted); font-size: 14px; }
+    .formula {
+      background: #f8fafc;
+      border: 1px dashed #cbd5e1;
+      border-radius: 10px;
+      padding: 10px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      white-space: pre-wrap;
+    }
+    .io-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .pill {
+      display: inline-block;
+      background: var(--accent-soft);
+      color: #0b5f58;
+      border: 1px solid #b4e6e1;
+      border-radius: 999px;
+      padding: 4px 10px;
+      margin: 2px 4px 2px 0;
+      font-size: 13px;
+    }
+    .path-list {
+      padding-left: 18px;
+      margin: 8px 0;
+    }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-top: 10px;
+    }
+    select, button {
+      border: 1px solid #cbd5e1;
+      background: #fff;
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    button:hover, select:hover { border-color: #94a3b8; }
+    .status-ok { color: #166534; font-weight: 700; }
+    .status-bad { color: var(--warn); font-weight: 700; }
+    .layout {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .table-wrap {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: auto;
+      max-height: 74vh;
+      background: #fff;
+    }
+    table { width: 100%; border-collapse: collapse; min-width: 940px; }
+    thead th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: #f8fafc;
+      border-bottom: 1px solid #dbe4ef;
+      font-size: 13px;
+      text-align: left;
+      padding: 9px;
+    }
+    tbody td {
+      border-bottom: 1px solid #eef2f7;
+      vertical-align: top;
+      padding: 8px 9px;
+      font-size: 13px;
+    }
+    tbody tr:hover { background: #f8fbff; }
+    tbody tr.selected { background: #eaf8f6; }
+    .line-btn {
+      border: none;
+      background: transparent;
+      color: #0f5fb8;
+      text-decoration: underline;
+      padding: 0;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .code {
+      margin: 0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      white-space: pre;
+      font-size: 12px;
+    }
+    .tag {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 12px;
+      color: #fff;
+      white-space: nowrap;
+    }
+    .tag.建模 { background: var(--tag-model); }
+    .tag.离散化 { background: var(--tag-disc); }
+    .tag.局部矩阵 { background: var(--tag-local); }
+    .tag.全局组装 { background: var(--tag-global); }
+    .tag.线性求解 { background: var(--tag-solve); }
+    .tag.后处理 { background: var(--tag-post); }
+    .tag.可视化 { background: var(--tag-plot); }
+    .tag.注释 { background: var(--tag-note); }
+    .tag.分段 { background: var(--tag-sep); }
+    .detail {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      padding: 12px;
+      max-height: 74vh;
+      overflow: auto;
+    }
+    .detail h3 { margin-top: 4px; }
+    .detail .codebox {
+      margin: 8px 0;
+      background: #f8fafc;
+      border: 1px solid #dbe4ef;
+      border-radius: 10px;
+      padding: 8px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      white-space: pre-wrap;
+    }
+    .term-list {
+      margin: 0;
+      padding-left: 18px;
+      color: #283445;
+    }
+    .term-list li { margin-bottom: 4px; }
+    .glossary {
+      columns: 2;
+      column-gap: 20px;
+    }
+    .glossary p {
+      break-inside: avoid;
+      border: 1px solid #e5eaf1;
+      border-radius: 8px;
+      padding: 8px;
+      margin: 0 0 8px;
+      background: #fff;
+      font-size: 14px;
+    }
+    .test-list { margin: 8px 0 0; padding-left: 18px; }
+    .muted { color: var(--muted); }
+    @media (max-width: 1080px) {
+      .grid-2, .layout { grid-template-columns: 1fr; }
+      .glossary { columns: 1; }
+      .table-wrap { max-height: 55vh; }
+      .detail { max-height: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Chap2_4_LOD_Solution.m 逐行讲解</h1>
+    <p class="lead">目标：先讲清楚“这段代码在解什么 PDE 问题”，再逐行解释“每行在解题过程中发挥了什么作用”。术语保留，同时给出人话解释。</p>
+
+    <div class="grid-2">
+      <section class="card">
+        <h2>这段代码在解决什么问题</h2>
+        <div class="formula">一维异质扩散边值问题（Dirichlet 边界）：
+-(A_eps(x) * u'(x))' = f(x),   x in (0,1)
+u(0) = 0, u(1) = 0
+
+其中：f(x)=1，A_eps(x) 是快速振荡扩散系数。</div>
+        <p class="mini">术语解释：<b>异质扩散</b> = 材料导热/导流能力随位置快速变化；<b>Dirichlet 边界条件</b> = 两端点的解值被固定。</p>
+      </section>
+
+      <section class="card">
+        <h2>输入与输出</h2>
+        <div class="io-grid">
+          <div>
+            <h3>输入（建模数据）</h3>
+            <span class="pill">A_eps</span>
+            <span class="pill">f</span>
+            <span class="pill">Omega</span>
+            <span class="pill">H</span>
+            <span class="pill">h</span>
+            <p class="mini">H 是粗网格步长，h 是细网格步长，ratio=H/h 用来把粗细网格关联起来。</p>
+          </div>
+          <div>
+            <h3>输出（数值结果）</h3>
+            <span class="pill">u_FEM_ms</span>
+            <span class="pill">u_FEM</span>
+            <p class="mini"><b>u_FEM_ms</b> 是 LOD 粗网格解重建后的多尺度近似；<b>u_FEM</b> 是细网格标准 FEM 对照解。</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <section class="card">
+      <h2>解题路径（按流程）</h2>
+      <ol class="path-list">
+        <li>定义 PDE 数据：区间、源项、振荡系数。</li>
+        <li>在粗网格上构造 LOD 离散系统（刚度矩阵 K、载荷向量 F）。</li>
+        <li>解线性系统 Ku=F，得到粗节点解，再重建细尺度信息。</li>
+        <li>在细网格上做标准 FEM，作为参考对照。</li>
+        <li>把两种结果画在同一图上比较。</li>
+      </ol>
+    </section>
+
+    <section class="card">
+      <h2>逐行讲解（1-153 行）</h2>
+      <div class="controls">
+        <label for="tagFilter">按解题贡献标签筛选：</label>
+        <select id="tagFilter">
+          <option value="全部">全部</option>
+          <option value="建模">建模</option>
+          <option value="离散化">离散化</option>
+          <option value="局部矩阵">局部矩阵</option>
+          <option value="全局组装">全局组装</option>
+          <option value="线性求解">线性求解</option>
+          <option value="后处理">后处理</option>
+          <option value="可视化">可视化</option>
+          <option value="注释">注释</option>
+          <option value="分段">分段</option>
+        </select>
+        <button id="jumpKey">跳到关键深讲行</button>
+        <span id="coverage" class="mini"></span>
+      </div>
+
+      <div class="layout">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>行号</th>
+                <th>原代码</th>
+                <th>标签</th>
+                <th>role_in_problem（本行作用）</th>
+                <th>terms（术语 + 人话）</th>
+                <th>plain（人话解释）</th>
+              </tr>
+            </thead>
+            <tbody id="lineBody"></tbody>
+          </table>
+        </div>
+
+        <aside class="detail" id="detailPanel">
+          <h3>点击左侧行号查看“对最终解的影响”</h3>
+          <p class="muted">这里会显示当前行：代码、本行作用、术语解释、人话解释、以及它如何影响最终数值解。</p>
+        </aside>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>术语词典（本页使用）</h2>
+      <div class="glossary" id="glossary"></div>
+    </section>
+
+    <section class="card">
+      <h2>结果图怎么读</h2>
+      <p><b>figure(1)</b>：展示一个局部 <b>多尺度基函数（multiscale basis）</b> 的形状。你可以看到它不是简单直线，而是受振荡系数影响后“弯曲”的基函数。</p>
+      <p><b>figure(2)</b>：蓝线是 <code>u_FEM_ms</code>（LOD 多尺度近似），红色星线是 <code>u_FEM</code>（细网格标准 FEM 参考）。两者接近，说明粗网格 LOD 成功捕捉了主要行为。</p>
+    </section>
+
+    <section class="card">
+      <h2>内置自检（对应你的 Test Plan）</h2>
+      <ul class="test-list" id="testList"></ul>
+    </section>
+  </div>
+
+  <script>
+    const expectedLineCount = 153;
+
+    const matlabSource = `clear; clc; close all;
+
+%% 问题参数设置
+%HINT 还需要在单刚矩阵部分修改A_eps_inv_t
+epsilon = 2^(-5);          % 振荡系数周期参数
+Omega = [0, 1];            % 求解区间
+f = @(x) ones(size(x));    % 源项f≡1
+% A_eps = @(x) 1./(2 + cos(2*pi*x/epsilon));  % 振荡扩散系数
+% A_eps_inv = @(x) 1 ./ A_eps(x); % A_eps的逆
+A_eps = @(x) 1./(2 -sin(2*pi*tan(15*pi*x/32)));  % 扩散系数(2.17)，
+A_eps_inv = @(x) 1 ./ A_eps(x); % A_eps的逆
+
+
+
+% 网格尺寸
+H=2.^(-2);
+h=2.^(-6);
+x_nodes = Omega(1):H:Omega(2);  % 网格节点
+x_nodes=x_nodes';
+n = length(x_nodes) - 1;         % 单元数
+ratio=H/h;
+LeftBasisValue=zeros((ratio-1)*n,1);
+RightBasisValue=zeros((ratio-1)*n,1);
+InteriorNodes=zeros((ratio-1)*n,1);
+
+
+
+ %% LOD有限元离散与求解
+    % 3.1 刚度矩阵K组装（Λ_j^{ms}）
+    K = sparse(n-1, n-1);  % 稀疏矩阵存储（内部节点数：n-1）
+    F = zeros(n-1, 1);     % 载荷向量
+     for e = 1:n  % 遍历每个单元
+        % 单元节点坐标
+        x1 = x_nodes(e);
+        x2 = x_nodes(e+1);
+        he = x2 - x1;      % 单元长度
+        
+        % 单元刚度矩阵（局部2x2矩阵）
+    
+        c=integral(A_eps_inv, x1, x2);
+        K_e = (1 / c) * [1, -1; -1, 1];
+        
+        % 单元载荷向量（积分f(x)*Λ_j^{ms}(x)，f≡1）
+      % 用符号运算，后面可替换成数值计算
+       syms x t
+       A_eps_inv_t=2 -sin(2*pi*tan(15*pi*t/32));% 扩散系数(2.17)的逆
+      % A_eps_inv_t=2 + cos(2*pi*t/epsilon); % 振荡扩散系数(2.2)的逆
+       f1=int(A_eps_inv_t,t,x1,x);
+       F_e =[int(1-f1/c,x, x1, x2);int(f1/c, x,x1, x2)];
+       
+
+       %细网格上离散点基函数的值
+
+       LeftBasisValue((ratio-1)*(e-1)+1:(ratio-1)*e)=1-double(subs(f1,x,x1+h:h:x2-h)/c);
+       InteriorNodes((ratio-1)*(e-1)+1:(ratio-1)*e)=x1+h:h:x2-h;
+       RightBasisValue((ratio-1)*(e-1)+1:(ratio-1)*e)=double(subs(f1,x,x1+h:h:x2-h)/c);
+
+
+        
+        % 组装到全局矩阵（内部节点索引：e和e+1，排除边界节点1和n+1）
+        if e > 1  % 左节点为内部节点
+            K(e-1, e-1) = K(e-1, e-1) + K_e(1, 1);
+            F(e-1) = F(e-1) + F_e(1);
+            if e < n  % 右节点为内部节点（非最后一个单元）
+                K(e-1, e) = K(e-1, e) + K_e(1, 2);
+            end
+        end
+        if e < n  % 右节点为内部节点
+            K(e, e) = K(e, e) + K_e(2, 2);
+            F(e) = F(e) + F_e(2);
+            if e > 1  % 左节点为内部节点（非第一个单元）
+                K(e, e-1) = K(e, e-1) + K_e(2, 1);
+            end
+        end
+     end
+
+     %  plot 基函数Λ_j^{ms}(x)
+     figure(1)
+pointidx=3;
+idx=(pointidx-2)*(ratio-1)+1:(pointidx-1)*(ratio-1);
+RightPart= RightBasisValue(idx);
+idx=(pointidx-1)*(ratio-1)+1:(pointidx)*(ratio-1);
+LeftPart= LeftBasisValue(idx);
+xelem=(pointidx-2)*H:h:(pointidx)*H;
+basiselem=[0;RightPart;1;LeftPart;0];
+plot(xelem,basiselem,'b-')
+axis([0 1 0 1])
+    
+    % 3.2 求解线性方程组Ku=F
+    u_nodal = K \ F;  % TH内部节点的数值解
+    u_FEM=[0;u_nodal;0];
+    Left=[0;u_nodal];
+    Left=repmat(Left,1,ratio-1);
+    Left=Left';
+    Left=Left(:);
+    Right=[u_nodal;0];
+    Right=repmat(Right,1,ratio-1);
+    Right=Right';
+    Right=Right(:);
+    InteriorNodesValue=LeftBasisValue.*Left+RightBasisValue.*Right;
+    x_nodes_h=[x_nodes;InteriorNodes];
+    u_FEM_ms=[u_FEM;InteriorNodesValue];%TH每个单元内部Th离散点值
+
+    [x_nodes_h,idx]=sort(x_nodes_h);% Th节点按顺序排列
+    u_FEM_ms=u_FEM_ms(idx);% Th节点按顺序排列
+figure(2)
+    plot(x_nodes_h,u_FEM_ms,'b-', 'LineWidth', 2, 'DisplayName', ['数值解 H=2^{-' num2str(log2(1/H)) '}'])
+hold on 
+%% 细网格上有限元离散与求解
+x_nodes = Omega(1):h:Omega(2);  % 网格节点
+x_nodes=x_nodes';
+n = length(x_nodes) - 1;         % 单元数
+    % 刚度矩阵K组装（P1有限元，分段线性基函数）
+    K = sparse(n-1, n-1);  % 稀疏矩阵存储（内部节点数：n-1）
+    F = zeros(n-1, 1);     % 载荷向量
+     for e = 1:n  % 遍历每个单元
+        % 单元节点坐标
+        x1 = x_nodes(e);
+        x2 = x_nodes(e+1);
+        he = x2 - x1;      % 单元长度
+        
+        % 单元刚度矩阵（局部2x2矩阵）
+        % 基函数导数：Lambda1’=1/he, Lambda2’=-1/he
+        % 积分A_eps(x)在单元上的均值（因h>ε时A_eps周期振荡，用中点积分近似）
+        x_mid = (x1 + x2)/2;
+        A_avg = A_eps(x_mid);
+        K_e = (A_avg / he) * [1, -1; -1, 1];
+        
+        % 单元载荷向量（积分f(x)*Lambda_i(x)，f≡1）
+        F_e = (he/2) * [1; 1];  % 分段线性基函数积分结果
+        
+        % 组装到全局矩阵（内部节点索引：e和e+1，排除边界节点1和n+1）
+        if e > 1  % 左节点为内部节点
+            K(e-1, e-1) = K(e-1, e-1) + K_e(1, 1);
+            F(e-1) = F(e-1) + F_e(1);
+            if e < n  % 右节点为内部节点（非最后一个单元）
+                K(e-1, e) = K(e-1, e) + K_e(1, 2);
+            end
+        end
+        if e < n  % 右节点为内部节点
+            K(e, e) = K(e, e) + K_e(2, 2);
+            F(e) = F(e) + F_e(2);
+            if e > 1  % 左节点为内部节点（非第一个单元）
+                K(e, e-1) = K(e, e-1) + K_e(2, 1);
+            end
+        end
+    end
+    
+    % 3.2 求解线性方程组Ku=F
+    u_nodal = K \ F;  % 内部节点的数值解
+    u_FEM=[0;u_nodal;0];
+    plot(x_nodes,u_FEM,'r-*', 'LineWidth', 2, 'DisplayName', ['数值解 h=2^{-' num2str(log2(1/h)) '}'])
+  `;
+
+    const keyLines = [40, 41, 46, 47, 48, 49, 54, 55, 56, 60, 61, 62, 63, 64, 65, 68, 69, 70, 71, 72, 89, 90, 100, 101, 102, 104, 105, 125, 126, 127];
+
+    const glossary = {
+      "PDE": "偏微分方程，这里是扩散型方程。",
+      "Dirichlet 边界条件": "把边界上的函数值直接固定（本例固定为0）。",
+      "扩散系数": "描述介质传导能力的系数，空间上变化会让问题更难。",
+      "振荡系数": "系数在很小尺度上快速变化。",
+      "LOD": "Localized Orthogonal Decomposition，局部正交分解，多尺度数值方法。",
+      "多尺度基函数": "不仅有粗尺度形状，还吸收了细尺度振荡信息的基函数。",
+      "刚度矩阵 K": "离散后线性系统的主矩阵，编码了扩散算子。",
+      "载荷向量 F": "离散后的右端项，编码了源项 f 的贡献。",
+      "单元刚度矩阵 K_e": "每个网格单元自己的 2x2 小矩阵。",
+      "全局组装": "把每个单元的小矩阵/向量累加到总矩阵/向量。",
+      "稀疏矩阵": "大多数元素为0的矩阵，存储和求解更高效。",
+      "线性系统": "离散后得到 Ku=F，用代数方法求 u。",
+      "调和平均": "通过对 A^{-1} 积分再取倒数，适合扩散问题的平均方式。",
+      "符号积分": "用符号变量做精确积分，而不是数值近似。",
+      "后处理": "把求解得到的节点系数还原成可视化和比较用的函数值。",
+      "参考解": "用更细网格算出来的对照解，用于比较方法效果。"
+    };
+
+    const deepOverrides = {
+      40: {
+        role_in_problem: "计算单元内 A_eps^{-1} 的积分，为局部刚度做“调和平均”准备。",
+        terms: [
+          { term: "调和平均", explain: "扩散问题里常用 A^{-1} 积分来做等效，能更稳地反映高低导率混合。" },
+          { term: "局部积分", explain: "只在当前单元 [x1,x2] 上积分，不是全域积分。" }
+        ],
+        plain: "这行先问：当前小单元里材料到底有多“难导”？答案用 A 的倒数积分给出。",
+        impact: "它直接决定 K_e 的大小。如果这里算错，后面刚度矩阵就偏掉，u_nodal 会整体失真。"
+      },
+      41: {
+        role_in_problem: "构造当前单元的 2x2 刚度矩阵 K_e。",
+        terms: [
+          { term: "单元刚度矩阵 K_e", explain: "单元级别的离散算子，随后会被组装进全局 K。" },
+          { term: "P1 基函数结构", explain: "[1 -1; -1 1] 是一维线性基函数的标准导数耦合模板。" }
+        ],
+        plain: "这行把“单元难导程度”(1/c) 和“线性基函数模板”合成成局部矩阵。",
+        impact: "K_e 是最终 K 的积木块；每个单元都靠它贡献耦合强度。"
+      },
+      46: {
+        role_in_problem: "定义符号版 A_eps^{-1}(t)，用于后面符号积分。",
+        terms: [
+          { term: "符号变量 t", explain: "把积分变量和空间变量 x 区分开，便于写不定积分。" },
+          { term: "A_eps^{-1}", explain: "扩散系数的倒数，是本代码推导多尺度基函数表达式的核心。" }
+        ],
+        plain: "这行不是数值算值，而是先把“要积分的函数公式”写出来。",
+        impact: "它决定 f1 和 F_e 的表达式，进而影响载荷向量与基函数形状。"
+      },
+      47: {
+        role_in_problem: "保留另一种系数模型（注释状态），用于切换实验。",
+        terms: [
+          { term: "对照系数", explain: "同一算法下替换系数模型，观察结果变化。" }
+        ],
+        plain: "这是备选方案，当前没启用，但告诉你代码支持另一种振荡系数。",
+        impact: "打开它会改变整个问题数据，最终解的形状会明显变化。"
+      },
+      48: {
+        role_in_problem: "构造从 x1 到 x 的累积积分 f1，作为多尺度基函数构造中间量。",
+        terms: [
+          { term: "累积积分", explain: "上限是变量 x，所以得到的是一个函数，不是单个数。" }
+        ],
+        plain: "这行等于在问：从单元左端走到任意位置 x，A^{-1} 累计了多少。",
+        impact: "后面左/右基函数值和 F_e 都依赖它。"
+      },
+      49: {
+        role_in_problem: "通过积分得到单元载荷向量 F_e 的两个分量。",
+        terms: [
+          { term: "载荷向量 F_e", explain: "右端 f 在局部基函数上的投影结果。" },
+          { term: "多尺度基函数积分", explain: "这里不是普通线性帽函数，而是修正后的基函数形状。" }
+        ],
+        plain: "这行算的是：源项 f=1 在左/右局部多尺度基函数上各贡献多少。",
+        impact: "它影响全局右端 F，进而影响线性系统求出来的幅值。"
+      },
+      54: {
+        role_in_problem: "计算单元内部细节点上的左侧多尺度基函数取值。",
+        terms: [
+          { term: "细网格采样", explain: "在 x1+h 到 x2-h 的内部细节点上评价函数值。" },
+          { term: "LeftBasisValue", explain: "存储每个粗单元内部左基函数的离散值。" }
+        ],
+        plain: "这行把“连续公式”变成“离散点值”，方便后面重建函数曲线。",
+        impact: "它决定 u_FEM_ms 在单元左侧过渡形状。"
+      },
+      55: {
+        role_in_problem: "记录每个粗单元内部的细节点坐标。",
+        terms: [
+          { term: "InteriorNodes", explain: "粗单元内部的细网格节点位置集合。" }
+        ],
+        plain: "这行把内部坐标存起来，后面拼接完整曲线时要用。",
+        impact: "没有这些坐标就无法画出 u_FEM_ms 的细节波形。"
+      },
+      56: {
+        role_in_problem: "计算单元内部细节点上的右侧多尺度基函数取值。",
+        terms: [
+          { term: "RightBasisValue", explain: "存储每个粗单元内部右基函数的离散值。" }
+        ],
+        plain: "与第54行配对，左基函数+右基函数一起完成单元内插值重建。",
+        impact: "直接影响重建解在单元右侧的形状与连续性。"
+      },
+      60: {
+        role_in_problem: "说明接下来进入“局部到全局”的组装阶段。",
+        terms: [{ term: "全局组装", explain: "将 K_e、F_e 按自由度索引加到 K、F。" }],
+        plain: "从这行开始，代码把每个单元贡献拼成一个全局线性系统。",
+        impact: "这是离散求解能否成立的核心步骤。"
+      },
+      61: {
+        role_in_problem: "判断单元左节点是否是内部自由度。",
+        terms: [{ term: "内部节点", explain: "不在 Dirichlet 边界上的未知量节点。" }],
+        plain: "边界点解固定为0，不进未知向量，所以这里只处理内部点。",
+        impact: "正确处理边界可保证系统维度和物理边界条件一致。"
+      },
+      62: {
+        role_in_problem: "累加 K_e(1,1) 到全局 K 的对应对角项。",
+        terms: [{ term: "对角项", explain: "节点自身刚度贡献。" }],
+        plain: "把当前单元给左节点自身的“硬度”加进总矩阵。",
+        impact: "对角项控制稳定性与解的尺度。"
+      },
+      63: {
+        role_in_problem: "累加 F_e(1) 到全局 F 的左节点分量。",
+        terms: [{ term: "右端累加", explain: "把局部源项贡献加入全局载荷。" }],
+        plain: "当前单元对左节点“推动力”加到总右端。",
+        impact: "影响对应自由度的数值大小。"
+      },
+      64: {
+        role_in_problem: "判断单元右节点是否也是内部节点。",
+        terms: [{ term: "边界排除", explain: "最后一个单元右端在边界上，不作为未知量。" }],
+        plain: "防止把边界点错误地当成未知自由度。",
+        impact: "避免越界写入和错误边界处理。"
+      },
+      65: {
+        role_in_problem: "累加局部耦合项 K_e(1,2) 到全局上三角。",
+        terms: [{ term: "耦合项", explain: "相邻节点之间的相互作用强度。" }],
+        plain: "左节点和右节点之间的连边强度加到矩阵里。",
+        impact: "控制解的平滑耦合关系。"
+      },
+      68: {
+        role_in_problem: "进入右节点内部自由度分支。",
+        terms: [{ term: "自由度判断", explain: "只给内部未知量写矩阵条目。" }],
+        plain: "与第61行对称，处理右节点。",
+        impact: "保持装配完整和边界一致。"
+      },
+      69: {
+        role_in_problem: "累加 K_e(2,2) 到全局 K 对角。",
+        terms: [{ term: "局部到全局映射", explain: "把单元局部索引2映射到全局节点 e。" }],
+        plain: "给右节点自身刚度加贡献。",
+        impact: "直接影响矩阵主对角。"
+      },
+      70: {
+        role_in_problem: "累加 F_e(2) 到全局 F。",
+        terms: [{ term: "载荷累加", explain: "局部右端对全局右端的贡献。" }],
+        plain: "把单元对右节点的源项贡献加进去。",
+        impact: "影响对应未知量的驱动力。"
+      },
+      71: {
+        role_in_problem: "判断左邻节点是否内部，以便写下三角耦合。",
+        terms: [{ term: "对称装配", explain: "K_e(2,1) 与 K_e(1,2) 成对出现。" }],
+        plain: "这步是为矩阵另一半耦合项做准备。",
+        impact: "保持矩阵结构正确。"
+      },
+      72: {
+        role_in_problem: "累加 K_e(2,1) 到全局下三角。",
+        terms: [{ term: "下三角项", explain: "相邻节点反向耦合，通常与上三角镜像。" }],
+        plain: "补上另一个方向的节点耦合。",
+        impact: "保证系统矩阵完整。"
+      },
+      89: {
+        role_in_problem: "提示接下来求解线性系统 Ku=F。",
+        terms: [{ term: "线性系统", explain: "离散 PDE 最终转化成的代数方程组。" }],
+        plain: "从“建方程”切换到“解方程”。",
+        impact: "标志着数值解即将产生。"
+      },
+      90: {
+        role_in_problem: "用 MATLAB 反斜杠求解内部节点解 u_nodal。",
+        terms: [
+          { term: "反斜杠求解", explain: "MATLAB 对稀疏线性系统的高效直接/迭代求解入口。" },
+          { term: "内部自由度解", explain: "只包含边界以外的未知量。" }
+        ],
+        plain: "这一行直接给出粗网格内部节点的数值答案。",
+        impact: "它是后续重建 u_FEM_ms 的核心系数来源。"
+      },
+      100: {
+        role_in_problem: "用左右多尺度基函数值组合得到内部细节点上的解值。",
+        terms: [{ term: "基函数重建", explain: "解值=系数×基函数，再按节点叠加。" }],
+        plain: "这行把“节点系数”变成“单元内部连续曲线上的值”。",
+        impact: "决定 u_FEM_ms 的细尺度形状与幅值。"
+      },
+      101: {
+        role_in_problem: "把粗网格节点和内部细节点坐标拼成一个坐标向量。",
+        terms: [{ term: "节点拼接", explain: "为了统一排序和绘图。" }],
+        plain: "把所有 x 坐标放到一起，准备画完整解曲线。",
+        impact: "影响后续绘图横坐标。"
+      },
+      102: {
+        role_in_problem: "把粗节点解和内部重建值拼成完整多尺度解向量。",
+        terms: [{ term: "多尺度重建解", explain: "包含粗节点和单元内部细节点信息的解。" }],
+        plain: "这一步得到最终要展示的 LOD 解数据。",
+        impact: "它就是蓝线的数据源。"
+      },
+      104: {
+        role_in_problem: "按坐标对拼接后的节点排序，并返回重排索引 idx。",
+        terms: [{ term: "排序索引", explain: "确保 x 从小到大，绘图不会乱线。" }],
+        plain: "拼接后顺序会乱，这里先排序坐标。",
+        impact: "没有它，图会折返、错乱。"
+      },
+      105: {
+        role_in_problem: "按同样 idx 重排解向量，保证与排序后的坐标一一对应。",
+        terms: [{ term: "同步重排", explain: "坐标和函数值必须使用同一个索引重排。" }],
+        plain: "坐标变了，函数值也要按同样顺序变。",
+        impact: "保证绘图点对点对应正确。"
+      },
+      125: {
+        role_in_problem: "计算细网格单元中点 x_mid，用于中点积分近似 A 平均值。",
+        terms: [
+          { term: "中点积分", explain: "用单元中点函数值近似单元积分/平均。" }
+        ],
+        plain: "细网格 FEM 里，这里用一个简单稳妥的近似代表单元系数。",
+        impact: "影响细网格参考解的局部刚度精度。"
+      },
+      126: {
+        role_in_problem: "取中点处扩散系数 A_eps 作为单元平均 A_avg。",
+        terms: [{ term: "A_avg", explain: "单元等效扩散系数近似值。" }],
+        plain: "把振荡系数在这个小单元里压缩成一个代表值。",
+        impact: "决定该单元刚度大小。"
+      },
+      127: {
+        role_in_problem: "构造细网格标准 FEM 的单元刚度矩阵。",
+        terms: [
+          { term: "标准 P1 FEM", explain: "线性有限元的经典刚度公式。" },
+          { term: "参考解离散", explain: "后面对照的红色曲线来源。" }
+        ],
+        plain: "这行是细网格版本的 K_e，作为“更细精度”对照基准。",
+        impact: "它决定参考解 u_FEM 的准确性。"
+      }
+    };
+
+    const codeLinesRaw = matlabSource.split("\n");
+    if (codeLinesRaw.length && codeLinesRaw[codeLinesRaw.length - 1] === "") {
+      codeLinesRaw.pop();
+    }
+
+    function uniqueTerms(arr) {
+      const seen = new Set();
+      return arr.filter(t => {
+        const k = `${t.term}|${t.explain}`;
+        if (seen.has(k)) return false;
+        seen.add(k);
+        return true;
+      });
+    }
+
+    function baseByLine(line) {
+      if (line === 1) return { tag: "建模", role: "初始化 MATLAB 环境，清空旧状态。", stage: "初始化" };
+      if (line >= 2 && line <= 2) return { tag: "分段", role: "用空行分隔模块，帮助阅读。", stage: "初始化" };
+      if (line >= 3 && line <= 13) return { tag: "建模", role: "定义 PDE 模型参数（区域、源项、扩散系数）。", stage: "问题定义" };
+      if (line >= 14 && line <= 24) return { tag: "离散化", role: "设置粗网格/细网格关系与存储向量。", stage: "网格准备" };
+      if (line >= 25 && line <= 27) return { tag: "分段", role: "流程分隔，进入 LOD 离散求解。", stage: "网格准备" };
+      if (line >= 28 && line <= 31) return { tag: "离散化", role: "初始化 LOD 粗网格线性系统 K 和 F。", stage: "LOD 组装" };
+      if (line >= 32 && line <= 39) return { tag: "局部矩阵", role: "遍历单元并准备单元几何量。", stage: "LOD 组装" };
+      if (line >= 40 && line <= 59) return { tag: "局部矩阵", role: "计算单元刚度、载荷和多尺度基函数离散值。", stage: "LOD 组装" };
+      if (line >= 60 && line <= 75) return { tag: "全局组装", role: "把单元贡献组装到全局 K、F。", stage: "LOD 组装" };
+      if (line >= 76 && line <= 88) return { tag: "可视化", role: "绘制局部多尺度基函数形状。", stage: "LOD 可视化" };
+      if (line >= 89 && line <= 99) return { tag: "线性求解", role: "求解 Ku=F 并准备重建所需系数。", stage: "LOD 求解" };
+      if (line >= 100 && line <= 105) return { tag: "后处理", role: "重建细尺度解并按坐标排序。", stage: "LOD 后处理" };
+      if (line >= 106 && line <= 108) return { tag: "可视化", role: "绘制 LOD 多尺度解曲线。", stage: "LOD 可视化" };
+      if (line >= 109 && line <= 115) return { tag: "离散化", role: "切换到细网格 FEM，对照计算初始化。", stage: "参考解准备" };
+      if (line >= 116 && line <= 131) return { tag: "局部矩阵", role: "细网格单元级刚度/载荷计算。", stage: "参考解组装" };
+      if (line >= 132 && line <= 147) return { tag: "全局组装", role: "细网格单元贡献组装到全局系统。", stage: "参考解组装" };
+      if (line >= 148 && line <= 152) return { tag: "线性求解", role: "求细网格线性系统解。", stage: "参考解求解" };
+      if (line === 153) return { tag: "可视化", role: "绘制细网格对照解。", stage: "结果对比" };
+      return { tag: "分段", role: "流程分隔", stage: "流程分隔" };
+    }
+
+    function inferTerms(line, code, tag) {
+      const terms = [];
+      const add = (term, explain) => terms.push({ term, explain });
+      const t = code.trim();
+
+      if (t === "") add("流程分段", "空行不参与计算，但帮助你把步骤分块理解。");
+      if (t.startsWith("%")) add("注释", "注释不执行，只说明意图或提醒。" );
+      if (t.includes("epsilon")) add("振荡系数", "控制系数快速变化尺度，epsilon 越小，振荡越快。");
+      if (t.includes("Omega")) add("计算域", "PDE 求解区间，本例是 [0,1]。");
+      if (t.includes("f = @(x)")) add("源项", "方程右端驱动项，本例恒为1。");
+      if (t.includes("A_eps")) add("扩散系数", "描述介质导流/导热能力的空间变化函数。");
+      if (t.includes("A_eps_inv")) add("逆系数", "扩散系数倒数，常用于一维扩散等效处理。");
+      if (t.includes("sparse")) add("稀疏矩阵", "零元素很多的矩阵，用稀疏存储更高效。");
+      if (t.startsWith("for e =")) add("单元循环", "逐个网格单元计算局部贡献。");
+      if (t.includes("K_e")) add("单元刚度矩阵", "每个单元的局部离散矩阵。");
+      if (t.includes("F_e")) add("单元载荷向量", "每个单元对右端项的局部贡献。");
+      if (t.includes("if e > 1") || t.includes("if e < n")) add("边界处理", "边界节点不作为未知自由度组装。");
+      if (t.includes("K \ F")) add("线性系统求解", "求 Ku=F 得到节点解系数。");
+      if (t.includes("plot(") || t.includes("figure(") || t.includes("axis(")) add("可视化", "将数值结果画出来便于判断形状与误差。");
+      if (t.includes("sort(")) add("排序", "保证坐标与解向量按同一顺序对应。");
+      if (t.includes("repmat(")) add("向量扩展", "复制节点系数到多个内部点位置用于重建。");
+      if (t.includes("subs(")) add("符号代入", "把符号表达式在离散点上求值。");
+      if (t.includes("syms")) add("符号计算", "先保留解析表达式，再做积分或代入。");
+
+      if (terms.length === 0) {
+        if (tag === "建模") add("模型定义", "定义 PDE 需要的输入数据。");
+        else if (tag === "离散化") add("离散化", "把连续问题映射到有限维线性系统。");
+        else if (tag === "局部矩阵") add("局部离散", "在单元尺度建立局部方程贡献。");
+        else if (tag === "全局组装") add("全局组装", "累加单元贡献形成整体系统。");
+        else if (tag === "线性求解") add("代数求解", "求解离散后的方程组。");
+        else if (tag === "后处理") add("后处理", "重建、整理、准备展示结果。");
+        else if (tag === "可视化") add("结果展示", "用图查看基函数和解的形状。");
+        else if (tag === "注释") add("注释", "帮助理解，不参与计算。");
+        else add("流程组织", "帮助阅读代码结构。");
+      }
+
+      return uniqueTerms(terms);
+    }
+
+    function inferPlain(line, code, baseRole) {
+      const t = code.trim();
+      if (t === "") return "这行是空行，作用是把步骤切开，让你更容易按“建模→组装→求解→对照”来读。";
+      if (t.startsWith("%")) return "这行是注释，不会执行；它在告诉你“接下来要做什么”或者提醒你可替换方案。";
+      if (t.startsWith("for e =")) return "从这行开始逐个单元处理，思路是“先算每个小单元，再拼成全局问题”。";
+      if (t.startsWith("if ")) return "这是条件分支，用来排除边界节点，避免把已知边界值误当成未知量。";
+      if (t === "end") return "结束当前循环或条件块，表示一个局部计算步骤完成。";
+      if (t.includes("=") && !t.startsWith("plot(")) {
+        const left = t.split("=")[0].trim();
+        return `这行在给 ${left} 赋值，把当前步骤需要的数据准备好，服务于“${baseRole}”。`;
+      }
+      if (t.startsWith("plot(")) return "这行把计算结果画出来，让你直观看到基函数或解曲线形状。";
+      return `这行属于“${baseRole}”这一步，目的是让离散系统更完整，最终得到可比较的数值解。`;
+    }
+
+    function inferImpact(line, tag) {
+      if (tag === "建模") return "影响模型本身：输入数据不同，后续所有计算都会变。";
+      if (tag === "离散化") return "影响离散精度与自由度规模，决定后续矩阵大小和近似能力。";
+      if (tag === "局部矩阵") return "影响单元贡献，误差会在全局组装时累积到总系统。";
+      if (tag === "全局组装") return "影响全局 K/F 的正确性，组装错会直接导致解错误。";
+      if (tag === "线性求解") return "直接产出未知系数，决定最终解值。";
+      if (tag === "后处理") return "影响结果能否正确重建与比较。";
+      if (tag === "可视化") return "不改变计算值，但决定你能否正确读懂结果。";
+      if (tag === "注释") return "不改变计算结果，但帮助避免误解和误改。";
+      return "主要影响代码可读性和流程组织。";
+    }
+
+    function buildLineInfo(lineNumber, codeLine) {
+      const base = baseByLine(lineNumber);
+      const override = deepOverrides[lineNumber] || {};
+      const trimmed = codeLine.trim();
+      let normalizedTag = base.tag;
+      if (trimmed === "") normalizedTag = "分段";
+      else if (trimmed.startsWith("%")) normalizedTag = "注释";
+
+      const role_in_problem = override.role_in_problem || base.role;
+      const terms = override.terms || inferTerms(lineNumber, codeLine, normalizedTag);
+      const plain = override.plain || inferPlain(lineNumber, codeLine, base.role);
+      const impact = override.impact || inferImpact(lineNumber, normalizedTag);
+
+      return {
+        line: lineNumber,
+        code: codeLine,
+        role_in_problem,
+        terms,
+        plain,
+        impact,
+        contribution_tag: normalizedTag,
+        stage: base.stage
+      };
+    }
+
+    const lineInfos = codeLinesRaw.map((code, idx) => buildLineInfo(idx + 1, code));
+
+    let activeTag = "全部";
+    let selectedLine = null;
+
+    const lineBody = document.getElementById("lineBody");
+    const detailPanel = document.getElementById("detailPanel");
+    const tagFilter = document.getElementById("tagFilter");
+    const coverage = document.getElementById("coverage");
+
+    function termText(terms) {
+      return terms.map(t => `${t.term}（${t.explain}）`).join("；");
+    }
+
+    function renderTable() {
+      const rows = lineInfos.filter(item => activeTag === "全部" || item.contribution_tag === activeTag);
+      lineBody.innerHTML = rows.map(item => {
+        const selectedCls = selectedLine === item.line ? "selected" : "";
+        return `
+          <tr class="${selectedCls}" data-line="${item.line}">
+            <td><button class="line-btn" data-line="${item.line}">${item.line}</button></td>
+            <td><pre class="code">${escapeHtml(item.code)}</pre></td>
+            <td><span class="tag ${item.contribution_tag}">${item.contribution_tag}</span></td>
+            <td>${escapeHtml(item.role_in_problem)}</td>
+            <td>${escapeHtml(termText(item.terms))}</td>
+            <td>${escapeHtml(item.plain)}</td>
+          </tr>
+        `;
+      }).join("");
+
+      lineBody.querySelectorAll(".line-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const line = Number(btn.dataset.line);
+          selectedLine = line;
+          renderTable();
+          renderDetail(line);
+        });
+      });
+    }
+
+    function renderDetail(line) {
+      const item = lineInfos.find(v => v.line === line);
+      if (!item) return;
+      detailPanel.innerHTML = `
+        <h3>第 ${item.line} 行：对最终解的影响</h3>
+        <div class="codebox">${escapeHtml(item.code || "(空行)")}</div>
+        <p><b>解题贡献标签：</b><span class="tag ${item.contribution_tag}">${item.contribution_tag}</span>　　<b>阶段：</b>${escapeHtml(item.stage)}</p>
+        <p><b>role_in_problem：</b>${escapeHtml(item.role_in_problem)}</p>
+        <p><b>terms（术语 + 人话）</b></p>
+        <ul class="term-list">
+          ${item.terms.map(t => `<li><b>${escapeHtml(t.term)}</b>：${escapeHtml(t.explain)}</li>`).join("")}
+        </ul>
+        <p><b>plain：</b>${escapeHtml(item.plain)}</p>
+        <p><b>这行如何影响最终解：</b>${escapeHtml(item.impact)}</p>
+      `;
+    }
+
+    function renderCoverage() {
+      const missing = [];
+      for (let i = 1; i <= expectedLineCount; i += 1) {
+        if (!lineInfos.some(v => v.line === i)) missing.push(i);
+      }
+      const codeCountOk = lineInfos.length === expectedLineCount;
+      if (codeCountOk && missing.length === 0) {
+        coverage.innerHTML = `<span class="status-ok">覆盖检查通过：已解释 ${expectedLineCount}/${expectedLineCount} 行。</span>`;
+      } else {
+        coverage.innerHTML = `<span class="status-bad">覆盖检查失败：当前 ${lineInfos.length}/${expectedLineCount} 行，缺失行 ${missing.join(", ") || "无"}。</span>`;
+      }
+    }
+
+    function renderGlossary() {
+      const box = document.getElementById("glossary");
+      box.innerHTML = Object.entries(glossary)
+        .map(([k, v]) => `<p><b>${escapeHtml(k)}</b>：${escapeHtml(v)}</p>`)
+        .join("");
+    }
+
+    function renderTests() {
+      const list = document.getElementById("testList");
+      const hasCoreFlow = ["建模", "离散化", "局部矩阵", "全局组装", "线性求解", "后处理", "可视化"]
+        .every(tag => lineInfos.some(v => v.contribution_tag === tag));
+      const termsOk = lineInfos.every(v => Array.isArray(v.terms) && v.terms.length > 0);
+
+      const sample = randomPick(lineInfos, 10)
+        .map(v => `第 ${v.line} 行：做的是“${v.role_in_problem}”；它对解的作用是“${v.impact}”`);
+
+      const items = [
+        `覆盖性：${lineInfos.length === expectedLineCount ? "通过" : "不通过"}（当前 ${lineInfos.length}/${expectedLineCount} 行）`,
+        `解题链路：${hasCoreFlow ? "通过" : "不通过"}（建模→离散→组装→求解→后处理→可视化）`,
+        `术语质量基础检查：${termsOk ? "通过" : "不通过"}（每行均有术语解释）`,
+        `新手抽查样例（10行）：${sample.join("；")}`
+      ];
+      list.innerHTML = items.map(t => `<li>${escapeHtml(t)}</li>`).join("");
+    }
+
+    function randomPick(arr, n) {
+      const copy = arr.slice();
+      const out = [];
+      for (let i = 0; i < n && copy.length > 0; i += 1) {
+        const idx = Math.floor(Math.random() * copy.length);
+        out.push(copy[idx]);
+        copy.splice(idx, 1);
+      }
+      return out;
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    tagFilter.addEventListener("change", (e) => {
+      activeTag = e.target.value;
+      renderTable();
+    });
+
+    document.getElementById("jumpKey").addEventListener("click", () => {
+      const first = keyLines.find(line => lineInfos.some(v => v.line === line && (activeTag === "全部" || v.contribution_tag === activeTag)));
+      if (!first) return;
+      selectedLine = first;
+      renderTable();
+      renderDetail(first);
+      const row = lineBody.querySelector(`tr[data-line="${first}"]`);
+      if (row) row.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+
+    renderTable();
+    renderCoverage();
+    renderGlossary();
+    renderTests();
+  </script>
+</body>
+</html>
