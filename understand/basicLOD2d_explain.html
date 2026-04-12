@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>basicLOD2d.m 代码解释</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --ink: #1f2a37;
+      --muted: #5b6675;
+      --line: #dde4ee;
+      --accent: #0f766e;
+      --accent-soft: #e6f8f6;
+      --tag-model: #1d4ed8;
+      --tag-mesh: #7c3aed;
+      --tag-operator: #0e7490;
+      --tag-corrector: #0369a1;
+      --tag-solve: #166534;
+      --tag-ref: #b45309;
+      --tag-plot: #be123c;
+      --tag-sub: #475569;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: radial-gradient(circle at 0 0, #eef7ff 0, var(--bg) 48%);
+      color: var(--ink);
+      font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+      line-height: 1.55;
+    }
+    .wrap { max-width: 1320px; margin: 0 auto; padding: 20px; }
+    h1, h2, h3 { margin: 0 0 10px; }
+    h1 { font-size: 28px; }
+    h2 { font-size: 22px; margin-top: 26px; }
+    h3 { font-size: 18px; margin-top: 16px; }
+    .lead { color: var(--muted); margin: 8px 0 0; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+      margin-top: 14px;
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05);
+    }
+    .grid-2 { display: grid; grid-template-columns: 1.1fr 1fr; gap: 14px; }
+    .formula {
+      background: #f8fafc;
+      border: 1px dashed #cbd5e1;
+      border-radius: 10px;
+      padding: 10px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      white-space: pre-wrap;
+    }
+    .mini { color: var(--muted); font-size: 14px; }
+    .pill {
+      display: inline-block;
+      background: var(--accent-soft);
+      color: #0b5f58;
+      border: 1px solid #b4e6e1;
+      border-radius: 999px;
+      padding: 4px 10px;
+      margin: 2px 4px 2px 0;
+      font-size: 13px;
+    }
+    .path-list, .term-list { margin: 8px 0; padding-left: 18px; }
+    .layout { display: grid; grid-template-columns: 1.5fr 1fr; gap: 12px; margin-top: 12px; }
+    .table-wrap {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: auto;
+      max-height: 74vh;
+      background: #fff;
+    }
+    table { width: 100%; border-collapse: collapse; min-width: 880px; }
+    thead th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: #f8fafc;
+      border-bottom: 1px solid #dbe4ef;
+      font-size: 13px;
+      text-align: left;
+      padding: 9px;
+    }
+    tbody td {
+      border-bottom: 1px solid #eef2f7;
+      vertical-align: top;
+      padding: 8px 9px;
+      font-size: 13px;
+    }
+    tbody tr:hover { background: #f8fbff; }
+    .tag {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 12px;
+      color: #fff;
+      white-space: nowrap;
+    }
+    .tag.建模 { background: var(--tag-model); }
+    .tag.网格与空间 { background: var(--tag-mesh); }
+    .tag.算子与插值 { background: var(--tag-operator); }
+    .tag.校正子 { background: var(--tag-corrector); }
+    .tag.线性求解 { background: var(--tag-solve); }
+    .tag.参考解与误差 { background: var(--tag-ref); }
+    .tag.可视化 { background: var(--tag-plot); }
+    .tag.子程序 { background: var(--tag-sub); }
+    .detail {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      padding: 12px;
+      max-height: 74vh;
+      overflow: auto;
+    }
+    .codebox {
+      margin: 8px 0;
+      background: #f8fafc;
+      border: 1px solid #dbe4ef;
+      border-radius: 10px;
+      padding: 8px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      white-space: pre-wrap;
+    }
+    .glossary {
+      columns: 2;
+      column-gap: 20px;
+    }
+    .glossary p {
+      break-inside: avoid;
+      border: 1px solid #e5eaf1;
+      border-radius: 8px;
+      padding: 8px;
+      margin: 0 0 8px;
+      background: #fff;
+      font-size: 14px;
+    }
+    @media (max-width: 1080px) {
+      .grid-2, .layout { grid-template-columns: 1fr; }
+      .glossary { columns: 1; }
+      .table-wrap, .detail { max-height: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>basicLOD2d.m 逐段讲解</h1>
+    <p class="lead">目标：参照你现有解释页的风格，把 <code>basicLOD2d.m</code> 的主脚本与子程序串成一条完整“建模→离散→校正→求解→对照→误差”的解题链路。</p>
+
+    <div class="grid-2">
+      <section class="card">
+        <h2>这段代码在解决什么问题</h2>
+        <div class="formula">二维椭圆扩散方程（Dirichlet 边界）：
+-∇·(A(x)∇u) = f,  x ∈ Ω=(0,1)^2
+u = 0,            x ∈ ∂Ω
+
+其中 A(x) 在细尺度上快速变化（随机 0/1 相位材料），
+代码使用 LOD（Localized Orthogonal Decomposition）在粗网格上构造多尺度基，
+并与细网格参考 FEM 解进行比较。</div>
+        <p class="mini"><b>一句话：</b>用“局部校正过的粗网格基函数”逼近原本需要细网格才能分辨的多尺度扩散解。</p>
+      </section>
+
+      <section class="card">
+        <h2>输入与输出</h2>
+        <h3>输入（核心参数）</h3>
+        <span class="pill">alpha, beta</span>
+        <span class="pill">Neps</span>
+        <span class="pill">Hlevel, hlevel</span>
+        <span class="pill">ell</span>
+        <span class="pill">Aeps, A(x), f(x)</span>
+        <p class="mini"><code>Hlevel</code> 控制粗网格，<code>hlevel</code> 控制细网格，<code>ell</code> 控制局部 patch 半径。</p>
+
+        <h3>输出（数值结果）</h3>
+        <span class="pill">uHms</span>
+        <span class="pill">uH</span>
+        <span class="pill">uh</span>
+        <span class="pill">energy/L2 error</span>
+        <p class="mini"><b>uHms</b>：LOD 细尺度重建解；<b>uH</b>：LOD 粗自由度系数；<b>uh</b>：细网格参考解。</p>
+      </section>
+    </div>
+
+    <section class="card">
+      <h2>解题路径（按算法流程）</h2>
+      <ol class="path-list">
+        <li>构造随机高对比扩散系数 A，并设定右端 f。</li>
+        <li>生成粗网格 TH 与细网格 Th，并建立粗细网格之间的限制/延拓映射。</li>
+        <li>构造准插值算子 IH，以及元素 patch 邻接关系。</li>
+        <li>逐个粗单元求局部校正子 CT{k}，再拼成全局校正算子 C_ell。</li>
+        <li>得到 LOD 基函数矩阵 G=P1-C_ell，组装并求解粗尺度 LOD 线性系统。</li>
+        <li>重建细尺度 LOD 解 uHms，并计算细网格参考解 uh。</li>
+        <li>可视化 A、uh、uHms、uH，并打印能量范数和 L2 误差。</li>
+        <li>子程序部分提供网格加密、边提取、DG 刚度装配、面积计算等基础工具。</li>
+      </ol>
+    </section>
+
+    <section class="card">
+      <h2>主脚本与子程序分段讲解（1-381 行）</h2>
+      <div class="layout">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>行号范围</th>
+                <th>模块</th>
+                <th>标签</th>
+                <th>这段在干什么</th>
+                <th>为什么重要</th>
+              </tr>
+            </thead>
+            <tbody id="segmentBody"></tbody>
+          </table>
+        </div>
+        <aside class="detail" id="detailPanel">
+          <h3>点击左侧行号范围查看细讲</h3>
+          <p class="mini">会显示：代表代码、作用、术语解释、对最终解的影响。</p>
+        </aside>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>关键行深讲（与原脚本对应）</h2>
+      <ul class="path-list">
+        <li><code>39</code>：把离散系数矩阵 <code>Aeps</code> 包装成点值函数 <code>A(x)</code>，实现“系数场采样”。</li>
+        <li><code>95-100</code>：构造 <code>PiHdg, EH, IH</code>，这是 LOD 正交分解里“粗空间投影/准插值约束”的核心。</li>
+        <li><code>106-116</code>：用稀疏邻接矩阵构造 ell-patch，决定校正子局部化范围。</li>
+        <li><code>157-160</code>：解局部 saddle-like 系统并消元得到单元校正子 <code>CT{k}</code>。</li>
+        <li><code>184-186</code>：从局部校正子拼全局校正算子 <code>C_ell</code>，得到 LOD 基 <code>G=P1-C_ell</code>。</li>
+        <li><code>196-203</code>：组装 coarse LOD 系统并重建细尺度解 <code>uHms</code>。</li>
+        <li><code>209-212</code>：求细网格参考 FEM 解 <code>uh</code>，用于误差评估。</li>
+        <li><code>267-271</code>：输出能量范数和 L2 误差，直接给出方法效果量化指标。</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2>子程序职责地图</h2>
+      <ul class="path-list">
+        <li><b>refineMesh (282-300)</b>：重复调用 <code>refine</code>，返回细网格与一组跨层映射矩阵（<code>P1,R1,P0,P1dg</code>）。</li>
+        <li><b>refine (305-330)</b>：红加密每个三角形，更新边界节点和网格连接关系。</li>
+        <li><b>computeEdges (335-342)</b>：提取网格唯一边集合及边重数（判断边界/内部边）。</li>
+        <li><b>assembleStiffnessMatrixDG (349-371)</b>：基于单元梯度与系数装配 DG 刚度矩阵。</li>
+        <li><b>computeArea (376-380)</b>：计算每个三角形面积，供质量/刚度构造使用。</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2>术语词典（本页使用）</h2>
+      <div class="glossary" id="glossary"></div>
+    </section>
+  </div>
+
+  <script>
+    const segments = [
+      {
+        lines: "1-25",
+        module: "头注释 + 初始化",
+        tag: "建模",
+        role: "说明代码背景并清空工作区。",
+        why: "保证实验可复现，避免历史变量污染。",
+        code: "clear all;",
+        terms: [
+          { term: "可复现性", explain: "同样参数下得到同样结果，便于比较方法性能。" }
+        ],
+        impact: "不直接改变数值格式，但决定实验环境是否干净可靠。"
+      },
+      {
+        lines: "26-43",
+        module: "模型参数与系数场",
+        tag: "建模",
+        role: "定义 d, alpha, beta, Neps, Aeps, A(x), f(x)。",
+        why: "把 PDE 数据从数学对象落地为可计算对象。",
+        code: "A = @(x) Aeps((ceil(x(:,1)*Neps)-1)*Neps+(ceil(x(:,2)*Neps)));",
+        terms: [
+          { term: "高振荡系数", explain: "材料参数在细尺度突变，是多尺度问题核心难点。" },
+          { term: "采样函数", explain: "将点坐标映射到系数网格索引，获得 A(x) 取值。" }
+        ],
+        impact: "系数场决定解的细尺度结构，后面所有矩阵都依赖它。"
+      },
+      {
+        lines: "44-86",
+        module: "粗细网格与自由度",
+        tag: "网格与空间",
+        role: "从初始两三角剖分出发生成 TH、Th，并统计节点/单元/局部自由度。",
+        why: "LOD 的核心就是用粗网格自由度承载细网格信息。",
+        code: "[Th,P1,R1,P0,P1dg] = refineMesh(TH,hlevel-Hlevel);",
+        terms: [
+          { term: "P1/P0/P1dg", explain: "不同函数空间与网格层级之间的延拓/限制映射矩阵。" }
+        ],
+        impact: "决定后续局部问题的规模、patch 构造与系统维度。"
+      },
+      {
+        lines: "87-103",
+        module: "准插值算子 IH",
+        tag: "算子与插值",
+        role: "构造连续-间断空间嵌入、质量矩阵、L2 投影与 IH。",
+        why: "IH 约束是校正子问题里的正交条件来源。",
+        code: "IH = EH*PiHdg;",
+        terms: [
+          { term: "准插值", explain: "把细尺度函数映射到粗空间，同时保留稳定性。" },
+          { term: "L2 投影", explain: "在 L2 意义下最优近似到目标子空间。" }
+        ],
+        impact: "IH 定义错了会直接破坏 LOD 的分解结构与收敛性。"
+      },
+      {
+        lines: "104-123",
+        module: "patch 与细网格 DG 刚度",
+        tag: "算子与插值",
+        role: "构造粗单元邻接扩张 patch，并装配细网格 DG 刚度 Shdg。",
+        why: "patch 控制局部化半径；Shdg 是所有校正与求解的能量算子。",
+        code: "patch = spones(patch)+speye(NTH);",
+        terms: [
+          { term: "ell-patch", explain: "围绕目标粗单元扩张 ell 层邻居得到的局部区域。" },
+          { term: "DG 刚度", explain: "在间断局部基表达下的扩散双线性型矩阵。" }
+        ],
+        impact: "patch 太小会损失精度，太大则增加计算量。"
+      },
+      {
+        lines: "124-182",
+        module: "逐单元局部校正子",
+        tag: "校正子",
+        role: "每个粗单元上限制自由度、组局部矩阵、解约束系统并写入 CT{k}。",
+        why: "LOD 与普通 FEM 的关键差别就在这里。",
+        code: "CT{k}(dofph,:) = X(:,length(dofpH)+(1:d+1))-X(:,1:length(dofpH))*mu;",
+        terms: [
+          { term: "校正子 Corrector", explain: "补偿粗基函数缺失的细尺度振荡信息。" },
+          { term: "局部约束问题", explain: "在 patch 内求解，并满足准插值核空间约束。" }
+        ],
+        impact: "CT 质量直接决定 LOD 基函数质量，也决定 uHms 误差水平。"
+      },
+      {
+        lines: "183-203",
+        module: "LOD 基与粗系统求解",
+        tag: "线性求解",
+        role: "拼装全局校正算子 C_ell，得到 G，组装 SHLOD0/rhs 并求 uH，重建 uHms。",
+        why: "这是 LOD 主结果输出区。",
+        code: "uHms = G*uH;",
+        terms: [
+          { term: "LOD 基", explain: "经校正后的粗空间基，可在粗自由度下表示多尺度信息。" },
+          { term: "重建", explain: "先求粗系数，再映射回细尺度表示。" }
+        ],
+        impact: "给出最终 LOD 近似解，是后续比较对象。"
+      },
+      {
+        lines: "205-213",
+        module: "细网格参考解",
+        tag: "参考解与误差",
+        role: "在细网格上直接解标准 FEM 系统得到 uh。",
+        why: "作为近似“真解”用于衡量 LOD 误差。",
+        code: "uh(dofh) = Sh(dofh,dofh)\\(Mh(dofh,:)*f(Th.p));",
+        terms: [
+          { term: "Reference solution", explain: "高分辨率数值解，用于误差基准。" }
+        ],
+        impact: "参考解不准会导致误差评估偏差。"
+      },
+      {
+        lines: "214-257",
+        module: "四幅图可视化",
+        tag: "可视化",
+        role: "依次绘制系数场、参考解、LOD 全解、LOD 粗 FE 部分。",
+        why: "帮助同时观察输入异质性与输出解结构。",
+        code: "subplot(1,4,3); trisurf(...,uHms,...)",
+        terms: [
+          { term: "trisurf", explain: "三角网格上的标量场曲面可视化。" }
+        ],
+        impact: "不影响计算值，但决定结果诊断效率。"
+      },
+      {
+        lines: "265-271",
+        module: "误差输出",
+        tag: "参考解与误差",
+        role: "打印 LOD 的能量范数误差与 L2 误差，以及 FE 部分误差。",
+        why: "定量验证方法有效性。",
+        code: "fprintf('LOD-Error (in L2 norm): ...')",
+        terms: [
+          { term: "能量范数", explain: "与扩散算子相关的自然范数，反映梯度误差。" },
+          { term: "L2 范数", explain: "整体幅值误差，衡量点值意义下差距。" }
+        ],
+        impact: "直接给出论文表格和实验结论可用数据。"
+      },
+      {
+        lines: "282-380",
+        module: "子程序区",
+        tag: "子程序",
+        role: "提供 refineMesh/refine/computeEdges/assembleStiffnessMatrixDG/computeArea 五个基础函数。",
+        why: "主脚本依赖这些几何与矩阵工具完成全部流程。",
+        code: "function [Th,P1,R1,P0,P1dg] = refineMesh(Th,nref)",
+        terms: [
+          { term: "网格工具链", explain: "从剖分演化到算子装配的一组可复用底层模块。" }
+        ],
+        impact: "任何一个子程序错误都会在主流程里被放大。"
+      }
+    ];
+
+    const glossary = {
+      "LOD": "Localized Orthogonal Decomposition，局部正交分解多尺度方法。",
+      "ell-patch": "围绕某个粗单元扩展 ell 层邻接单元得到的局部区域。",
+      "Corrector": "局部校正函数，负责把细尺度信息嵌入粗空间。",
+      "DG 表示": "把连续函数按单元局部自由度表示为间断向量形式。",
+      "PiHdg": "从细尺度到粗间断空间的 L2 投影算子。",
+      "EH": "把粗间断函数平均回粗连续节点函数的嵌入/平均算子。",
+      "IH": "准插值算子，通常用于定义校正子约束核空间。",
+      "P1": "粗连续空间到细连续空间的延拓/插值矩阵。",
+      "P0": "粗单元指标到细单元指标的映射矩阵。",
+      "P1dg": "粗局部自由度到细局部自由度的映射矩阵。",
+      "Shdg": "细网格上按局部间断基装配的刚度矩阵。",
+      "uH": "LOD 在粗自由度上的系数向量。",
+      "uHms": "LOD 重建后的细尺度多尺度解。",
+      "uh": "细网格参考有限元解。",
+      "能量范数误差": "由刚度矩阵诱导的误差度量，偏重梯度误差。"
+    };
+
+    const segmentBody = document.getElementById("segmentBody");
+    const detailPanel = document.getElementById("detailPanel");
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    function renderTable() {
+      segmentBody.innerHTML = segments.map((s, i) => `
+        <tr data-idx="${i}">
+          <td><button data-idx="${i}" class="line-btn" style="border:none;background:transparent;color:#0f5fb8;text-decoration:underline;cursor:pointer;">${escapeHtml(s.lines)}</button></td>
+          <td>${escapeHtml(s.module)}</td>
+          <td><span class="tag ${escapeHtml(s.tag)}">${escapeHtml(s.tag)}</span></td>
+          <td>${escapeHtml(s.role)}</td>
+          <td>${escapeHtml(s.why)}</td>
+        </tr>
+      `).join("");
+
+      segmentBody.querySelectorAll(".line-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          renderDetail(Number(btn.dataset.idx));
+        });
+      });
+    }
+
+    function renderDetail(idx) {
+      const s = segments[idx];
+      if (!s) return;
+      detailPanel.innerHTML = `
+        <h3>${escapeHtml(s.lines)}：${escapeHtml(s.module)}</h3>
+        <div class="codebox">${escapeHtml(s.code)}</div>
+        <p><b>解题贡献标签：</b><span class="tag ${escapeHtml(s.tag)}">${escapeHtml(s.tag)}</span></p>
+        <p><b>这段在干什么：</b>${escapeHtml(s.role)}</p>
+        <p><b>为什么重要：</b>${escapeHtml(s.why)}</p>
+        <p><b>术语 + 人话：</b></p>
+        <ul class="term-list">
+          ${s.terms.map(t => `<li><b>${escapeHtml(t.term)}</b>：${escapeHtml(t.explain)}</li>`).join("")}
+        </ul>
+        <p><b>对最终解的影响：</b>${escapeHtml(s.impact)}</p>
+      `;
+    }
+
+    function renderGlossary() {
+      const box = document.getElementById("glossary");
+      box.innerHTML = Object.entries(glossary)
+        .map(([k, v]) => `<p><b>${escapeHtml(k)}</b>：${escapeHtml(v)}</p>`)
+        .join("");
+    }
+
+    renderTable();
+    renderDetail(0);
+    renderGlossary();
+  </script>
+</body>
+</html>

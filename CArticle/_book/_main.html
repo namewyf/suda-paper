@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>中文文章模板</title>
+  <meta name="description" content="这是用R的bookdown功能制作中文论文的模板，输出格式为bookdown::gitbook和bookdown::pdf_book." />
+  <meta name="generator" content="bookdown 0.46 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="中文文章模板" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="这是用R的bookdown功能制作中文论文的模板，输出格式为bookdown::gitbook和bookdown::pdf_book." />
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="中文文章模板" />
+  
+  <meta name="twitter:description" content="这是用R的bookdown功能制作中文论文的模板，输出格式为bookdown::gitbook和bookdown::pdf_book." />
+  
+
+<meta name="author" content="李东风" />
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+
+
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  jax: ["input/TeX","output/SVG"],
+  extensions: ["tex2jax.js","MathMenu.js","MathZoom.js"],
+  TeX: {
+    extensions: ["AMSmath.js","AMSsymbols.js","noErrors.js","noUndefined.js"]
+  }
+});
+</script>
+<script type="text/javascript"
+   src="../../../MathJax/MathJax.js">
+</script>
+
+
+<style type="text/css">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="chapter" data-level="1" data-path=""><a href="#intro"><i class="fa fa-check"></i><b>1</b> 简介</a></li>
+<li class="chapter" data-level="2" data-path=""><a href="#usage-ins"><i class="fa fa-check"></i><b>2</b> 安装设置</a></li>
+<li class="chapter" data-level="3" data-path=""><a href="#usage-writing"><i class="fa fa-check"></i><b>3</b> 编写自己的内容</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path=""><a href="#usage-writing-struct"><i class="fa fa-check"></i><b>3.1</b> 文档结构</a></li>
+<li class="chapter" data-level="3.2" data-path=""><a href="#usage-writing-fig"><i class="fa fa-check"></i><b>3.2</b> 图形自动编号</a></li>
+<li class="chapter" data-level="3.3" data-path=""><a href="#usage-writing-tab"><i class="fa fa-check"></i><b>3.3</b> 表格自动编号</a></li>
+<li class="chapter" data-level="3.4" data-path=""><a href="#usage-writing-math"><i class="fa fa-check"></i><b>3.4</b> 数学公式编号</a></li>
+<li class="chapter" data-level="3.5" data-path=""><a href="#%E6%96%87%E7%8C%AE%E5%BC%95%E7%94%A8%E4%B8%8E%E6%96%87%E7%8C%AE%E5%88%97%E8%A1%A8"><i class="fa fa-check"></i><b>3.5</b> 文献引用与文献列表</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path=""><a href="#usage-output"><i class="fa fa-check"></i><b>4</b> 转换</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path=""><a href="#usage-gitbook"><i class="fa fa-check"></i><b>4.1</b> 转换为网页</a></li>
+<li class="chapter" data-level="4.2" data-path=""><a href="#usage-pdfbook"><i class="fa fa-check"></i><b>4.2</b> 通过LaTeX生成PDF</a></li>
+<li class="chapter" data-level="4.3" data-path=""><a href="#usage-website"><i class="fa fa-check"></i><b>4.3</b> 上传到网站</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path=""><a href="#%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE"><i class="fa fa-check"></i>参考文献</a></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">中文文章模板</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="header">
+<h1 class="title">中文文章模板</h1>
+<p class="author"><em>李东风</em></p>
+<p class="date"><em>2030年6月5日</em></p>
+</div>
+<div id="intro" class="section level1 hasAnchor" number="1">
+<h1><span class="header-section-number">1</span> 简介<a href="#intro" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>R软件的bookdown扩展包是R Markdown的增强版，
+支持自动目录、文献索引、公式编号与引用、定理编号与引用、图表自动编号与引用等功能，
+可以作为LaTeX的一种替代解决方案，
+在制作用R进行数据分析建模的技术报告时，
+可以将报告文字、R程序、文字性结果、表格、图形都自动地融合在最后形成的网页或者PDF文件中。</p>
+<p>Bookdown使用的设置比较复杂，
+对初学者不够友好。
+这里制作了一些模板，
+用户只要解压缩打包的文件，
+对某个模板进行修改填充就可以变成自己的中文图书或者论文。
+Bookdown的详细用法参见<a href="https://bookdown.org/yihui/bookdown/" class="uri">https://bookdown.org/yihui/bookdown/</a>，
+在李东风的<a href="http://www.math.pku.edu.cn/teachers/lidf/docs/Rbook/html/_Rbook/index.html">《统计软件教程》</a>也有部分介绍。</p>
+<p><code>index.Rmd</code>文件的内容包含一些常用功能的示例，
+用户可以在编辑器中打开此文件参考其中的做法。</p>
+<p>Bookdown如果输出为网页，
+其中的数学公式需要MathJax程序库的支持，
+用如下数学公式测试浏览器中数学公式显示是否正常：</p>
+<p><span class="math display">\[
+\text{定积分} = \int_a^b f(x) \,dx
+\]</span></p>
+<p>如果显示不正常，
+可以在公式上右键单击，
+选择“Math Settings–Math Renderer”，
+依次使用改成“Common HTML”，“SVG”等是否可以变成正常显示。
+PDF版本不存在这样的问题。</p>
+</div>
+<div id="usage-ins" class="section level1 hasAnchor" number="2">
+<h1><span class="header-section-number">2</span> 安装设置<a href="#usage-ins" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>使用RStudio软件完成编辑和转换功能。
+在RStudio中，安装bookdown等必要的扩展包。</p>
+<p>本模板在安装之前是一个打包的zip文件，
+在适当位置解压（例如，在<code>C:/myproj</code>下），
+得到<code>MathJax</code>, <code>Books/Cbook</code>, <code>Books/Carticle</code>等子目录。
+本模板在<code>Books/Carticle</code>中。</p>
+<p>为了利用模板制作自己的中文论文，
+将<code>Books/CArticle</code>制作一个副本，
+改成适当的子目录名，如<code>Books/Myarticle</code>。</p>
+<p>打开RStudio软件，
+选选单“File - New Project - Existing Directory”，
+选中<code>Books/Myarticle</code>子目录，确定。
+这样生成一本书对应的R project（项目）。</p>
+<p>为了将模板内容替换成自己的内容，
+只要修改<code>index.Rmd</code>文件，
+删除原来的不必要的内容，
+替换成自己的内容。</p>
+<p>后面的§<a href="#usage-gitbook">4.1</a> 和§<a href="#usage-pdfbook">4.2</a> 给出了将当前的书转换为网页和PDF的命令，
+复制粘贴这些命令到RStudio命令行可以进行转换。</p>
+</div>
+<div id="usage-writing" class="section level1 hasAnchor" number="3">
+<h1><span class="header-section-number">3</span> 编写自己的内容<a href="#usage-writing" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="usage-writing-struct" class="section level2 hasAnchor" number="3.1">
+<h2><span class="header-section-number">3.1</span> 文档结构<a href="#usage-writing-struct" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>所有的内容都在<code>index.Rmd</code>中。
+每节用一个井号（<code>#</code>）引入的节标题，
+小节标题用两个个井号开始。
+标题后面都有大括号内以井号开头的标签，
+标签仅用英文大小写字母和减号。</p>
+</div>
+<div id="usage-writing-fig" class="section level2 hasAnchor" number="3.2">
+<h2><span class="header-section-number">3.2</span> 图形自动编号<a href="#usage-writing-fig" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>用R代码段生成的图形，
+只要具有代码段标签，
+且提供代码段选项<code>fig.cap="图形的说明文字"</code>，
+就可以对图形自动编号，
+并且可以用如<code>\@ref(fig:label)</code>的格式引用图形。
+如：</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">plot</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, <span class="at">main=</span><span class="st">&quot;程序生成的测试图形&quot;</span>)</span></code></pre></div>
+<div class="figure"><span style="display:block;" id="fig:u-w-f-ex01"></span>
+<img src="_main_files/figure-html/u-w-f-ex01-1.png" alt="图形说明文字" width="672" />
+<p class="caption">
+Figure 3.1: 图形说明文字
+</p>
+</div>
+<p>引用如：参见图<a href="#fig:u-w-f-ex01">3.1</a>。
+引用中的<code>fig:</code>是必须的。</p>
+<p>在通过LaTeX转换的PDF结果中，
+图形是浮动的。</p>
+</div>
+<div id="usage-writing-tab" class="section level2 hasAnchor" number="3.3">
+<h2><span class="header-section-number">3.3</span> 表格自动编号<a href="#usage-writing-tab" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>用R代码<code>knitr::kable()</code>生成的表格，
+只要具有代码段标签，
+并且在<code>knitr::kable()</code>调用时加选项<code>caption="表格的说明文字"</code>，
+就可以对表格自动编号，
+并且可以用如<code>\@ref(tab:label)</code>的格式引用表格。
+如：</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="st">&quot;自变量&quot;</span><span class="ot">=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, <span class="st">&quot;因变量&quot;</span><span class="ot">=</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>)<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(d, <span class="at">caption=</span><span class="st">&quot;表格说明文字&quot;</span>)</span></code></pre></div>
+<table>
+<caption><span id="tab:u-w-tab-ex01">Table 3.1: </span>表格说明文字</caption>
+<thead>
+<tr class="header">
+<th align="right">自变量</th>
+<th align="right">因变量</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="right">2</td>
+<td align="right">4</td>
+</tr>
+<tr class="odd">
+<td align="right">3</td>
+<td align="right">9</td>
+</tr>
+<tr class="even">
+<td align="right">4</td>
+<td align="right">16</td>
+</tr>
+<tr class="odd">
+<td align="right">5</td>
+<td align="right">25</td>
+</tr>
+<tr class="even">
+<td align="right">6</td>
+<td align="right">36</td>
+</tr>
+<tr class="odd">
+<td align="right">7</td>
+<td align="right">49</td>
+</tr>
+<tr class="even">
+<td align="right">8</td>
+<td align="right">64</td>
+</tr>
+<tr class="odd">
+<td align="right">9</td>
+<td align="right">81</td>
+</tr>
+<tr class="even">
+<td align="right">10</td>
+<td align="right">100</td>
+</tr>
+</tbody>
+</table>
+<p>引用如：参见表<a href="#tab:u-w-tab-ex01">3.1</a>。
+引用中的<code>tab:</code>是必须的。</p>
+<p>在通过LaTeX转换的PDF结果中，
+表格是浮动的。</p>
+</div>
+<div id="usage-writing-math" class="section level2 hasAnchor" number="3.4">
+<h2><span class="header-section-number">3.4</span> 数学公式编号<a href="#usage-writing-math" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>不需要编号的公式，
+仍可以按照一般的Rmd文件中公式的做法。
+需要编号的公式，
+直接写在<code>\begin{align}</code>和<code>\end{align}</code>之间，
+不需要编号的行在末尾用<code>\nonumber</code>标注。
+需要编号的行用<code>(\#eq:mylabel)</code>添加自定义标签，
+如</p>
+<p><span class="math display" id="eq:var-mat-def">\[\begin{align}
+\Sigma =&amp;  (\sigma_{ij})_{n\times n} \nonumber \\
+=&amp; E[(\boldsymbol{X} - \boldsymbol{\mu}) (\boldsymbol{X} - \boldsymbol{\mu})^T ]
+\tag{3.1}
+\end{align}\]</span></p>
+<p>引用如：协方差定义见<a href="#eq:var-mat-def">(3.1)</a>。</p>
+</div>
+<div id="文献引用与文献列表" class="section level2 hasAnchor" number="3.5">
+<h2><span class="header-section-number">3.5</span> 文献引用与文献列表<a href="#%E6%96%87%E7%8C%AE%E5%BC%95%E7%94%A8%E4%B8%8E%E6%96%87%E7%8C%AE%E5%88%97%E8%A1%A8" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>将所有文献用bib格式保存为一个<code>.bib</code>文献库，
+如模板中的样例文件<code>mybib.bib</code>。
+可以用JabRef软件来管理这样的文献库，
+许多其它软件都可以输出这样格式的文件库。</p>
+<p>为了引用某一本书，
+用如：参见<span class="citation">(<a href="#ref-Wichmann1982:RNG">Wichmann and Hill 1982</a>)</span>。</p>
+<p>被引用的文献将出现在一章末尾以及全书的末尾，
+对PDF输出则仅出现在全书末尾。</p>
+</div>
+</div>
+<div id="usage-output" class="section level1 hasAnchor" number="4">
+<h1><span class="header-section-number">4</span> 转换<a href="#usage-output" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="usage-gitbook" class="section level2 hasAnchor" number="4.1">
+<h2><span class="header-section-number">4.1</span> 转换为网页<a href="#usage-gitbook" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>用如下命令将整本书转换成一个网页，
+称为gitbook格式：</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>bookdown<span class="sc">::</span><span class="fu">render_book</span>(<span class="st">&quot;index.Rmd&quot;</span>, </span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>  <span class="at">output_format=</span><span class="st">&quot;bookdown::gitbook&quot;</span>, <span class="at">encoding=</span><span class="st">&quot;UTF-8&quot;</span>)</span></code></pre></div>
+<p>为查看结果，
+在<code>_book</code>子目录中双击其中的<code>_main.html</code>文件，
+就可以在网络浏览器中查看转换的结果。
+重新编译后应该点击“刷新”图标。</p>
+<p>网页可以通过Chrome网络浏览器中的“打印”功能转换为PDF。
+选菜单项“打印”，
+选择一个打印到PDF的打印机，
+如“另存为PDF”打印机，
+或Windows操作系统的“Microsoft print to PDF”打印机，
+在“更多设置”中选择缩放率为90%，
+点击“保存”按钮就可以将网页转换成PDF格式。</p>
+</div>
+<div id="usage-pdfbook" class="section level2 hasAnchor" number="4.2">
+<h2><span class="header-section-number">4.2</span> 通过LaTeX生成PDF<a href="#usage-pdfbook" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Bookdown可以借助TinyTeX编译软件将文章转换成一个PDF文件。
+这需要用户对LaTeX有一定的了解，
+否则一旦出错，
+就完全不知道如何解决。
+用户如果需要进行LaTeX定制，
+可修改模板中的<code>preamble.tex</code>文件。</p>
+<p>转换为PDF的命令如下：</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>bookdown<span class="sc">::</span><span class="fu">render_book</span>(<span class="st">&quot;index.Rmd&quot;</span>,</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>  <span class="at">output_format=</span><span class="st">&quot;bookdown::pdf_book&quot;</span>, <span class="at">encoding=</span><span class="st">&quot;UTF-8&quot;</span>)</span></code></pre></div>
+<p>在转换过程中可能需要联网下载所需的软件或者格式包。
+在<code>_book</code>子目录中找到<code>_main.pdf</code>文件，
+这是转换的结果。</p>
+<p>Bookdown使用rmarkdown扩展包和pandoc软件、LaTeX软件，
+在R中运行如下命令可以自动安装LaTeX软件，
+称为TinyTeX:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&#39;tinytex&#39;</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>tinytex<span class="sc">::</span><span class="fu">install_tinytex</span>()</span></code></pre></div>
+<p>安装过程需要从国外的服务器下载许多文件，
+在国内的网络环境下有可能因为网络超时而失败。
+如果安装成功，
+TinyTeX软件包在MS Windows系统中一般会安装在
+<code>C:\Users\用户名\AppData\Roaming\TinyTeX</code>目录中，
+其中“用户名”应替换成系统当前用户名。
+如果需要删除TinyTeX软件包，
+只要直接删除那个子目录就可以。</p>
+<p>为了判断TinyTeX是否安装成功，
+在RStudio中运行</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>tinytex<span class="sc">::</span><span class="fu">is_tinytex</span>()</span></code></pre></div>
+<p>结果应为<code>TRUE</code>,
+出错或者结果为<code>FALSE</code>都说明安装不成功。</p>
+</div>
+<div id="usage-website" class="section level2 hasAnchor" number="4.3">
+<h2><span class="header-section-number">4.3</span> 上传到网站<a href="#usage-website" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>如果书里面没有数学公式，
+则上传到网站就只要将<code>_book</code>子目录整个地用ftp软件传送到自己的网站主目录下的某个子目录即可。
+但是，为了支持数学公式，就需要进行如下的目录结构设置：</p>
+<ol style="list-style-type: decimal">
+<li>设自己的网站服务器目录为<code>/home/abc</code>，
+将MathJax目录上传到这个目录中。</li>
+<li>在<code>/home/abc</code>中建立新目录<code>Books/Mybook</code>。</li>
+<li>将<code>_book</code>子目录上传到<code>/home/abc/Books/Mybook</code>中。</li>
+<li>这时网站链接可能类似于<code>http://dept.univ.edu.cn/~abc/Books/Mybooks/_book/index.html</code>,
+具体链接地址依赖于服务器名称与主页所在的主目录名称。</li>
+</ol>
+<p>如果有多本书，
+<code>MathJax</code>仅需要上传一次。
+因为<code>MathJax</code>有三万多个文件，
+所以上传<code>MathJax</code>会花费很长时间。</p>
+<p><strong>注意</strong>：下面一行用于生成文献目录标题，
+不要删去下面的行：</p>
+</div>
+</div>
+<div id="参考文献" class="section level1 unnumbered hasAnchor">
+<h1>参考文献<a href="#%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<div id="ref-Wichmann1982:RNG" class="csl-entry">
+Wichmann, B. A., and I. D. Hill. 1982. <span>“Algorithm as 183: An Efficient and Portable Pseudo-Random Number Generator.”</span> <em>Applied Statistics</em> 31: 188–190. Remarks: 34, 198 and 35, 89.
+</div>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+  "sharing": {
+    "github": false,
+    "facebook": true,
+    "twitter": true,
+    "linkedin": false,
+    "weibo": false,
+    "instapaper": false,
+    "vk": false,
+    "whatsapp": false,
+    "all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+  },
+  "fontsettings": {
+    "theme": "white",
+    "family": "sans",
+    "size": 2
+  },
+  "edit": {
+    "link": null,
+    "text": null
+  },
+  "history": {
+    "link": null,
+    "text": null
+  },
+  "view": {
+    "link": null,
+    "text": null
+  },
+  "download": ["_main.pdf"],
+  "search": {
+    "engine": "fuse",
+    "options": null
+  },
+  "toc": {
+    "collapse": "subsection"
+  }
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>
