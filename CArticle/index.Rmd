@@ -203,7 +203,11 @@ W := \{w \in V : \mathcal{I}_H w = 0\} = \ker(\mathcal{I}_H).
 v = \mathcal{I}_H v + (1 - \mathcal{I}_H)v, \quad \mathcal{I}_H v \in V_H, \ (1 - \mathcal{I}_H)v \in W.
 \]
 
-这一分解在$H^1$范数下是稳定的。图3.1展示了典型多尺度解的尺度分解效果：粗尺度部分$\mathcal{I}_H u$捕捉了解的宏观趋势，而细尺度部分$(1 - \mathcal{I}_H)u$包含了所有微观震荡信息。
+这一分解在$H^1$范数下是稳定的。图\@ref(fig:fig3-1-diffusion)展示了典型多尺度解的尺度分解效果：粗尺度部分$\mathcal{I}_H u$捕捉了解的宏观趋势，而细尺度部分$(1 - \mathcal{I}_H)u$包含了所有微观震荡信息。
+
+```{r fig3-1-diffusion, fig.cap='扩散系数随机分布示意（图内标题为英文）', fig.align='center', out.width='72%'}
+knitr::include_graphics("figures/fig3-1-diffusion-coefficient.png")
+```
 
 ## $a$-正交化与理想多尺度空间 {#chap-3-2}
 
