@@ -1,44 +1,32 @@
-h1:sec-abstract 摘要
-h1:sec-intro 1. 引言
-h2:sec-intro-1 1.1 多尺度问题的挑战
-h2:sec-intro-2 1.2 数值均匀化方法概述
-h2:sec-intro-3 1.3 LOD 方法的发展与特点
-h2:sec-intro-4 1.4 本文结构与贡献
-h1:sec-model 2. 模型问题与有限元基础
-h2:sec-model-1 2.1 椭圆边值问题
-h2:sec-model-2 2.2 网格与有限元空间
-h2:sec-model-3 2.3 符号约定
-h1:sec-decomp 3. 拟插值算子与正交尺度分解
-h2:sec-decomp-1 3.1 拟插值算子  的构造
-h2:sec-decomp-2 3.2 性质与证明思路
-h2:sec-decomp-3 3.3 细尺度空间  与正交分解
-h2:sec-decomp-4 3.4 -正交分解与理想多尺度空间 
-h1:sec-ideal 4. 理想化数值均匀化方法
-h2:sec-ideal-1 4.1 理想化 Galerkin 格式
-h2:sec-ideal-2 4.2 先验误差估计
-h2:sec-ideal-3 4.3 Petrov-Galerkin 变体（可选）
-h1:sec-localized 5. 修正算子的局部化与完全离散格式
-h2:sec-localized-1 5.1 单元修正算子与分解
-h2:sec-localized-2 5.2 指数衰减性质
-h2:sec-localized-3 5.3 局部化修正算子 
-h2:sec-localized-4 5.4 细网格离散化
-h2:sec-localized-5 5.5 完全离散 LOD 方法
-h1:sec-impl 6. MATLAB 程序实现详解
-h2:sec-impl-1 6.1 整体流程
-h2:sec-impl-2 6.2 网格生成与数据结构
-h2:sec-impl-3 6.3 拟插值矩阵  的构造
-h2:sec-impl-4 6.4 单元邻域 patch 矩阵的生成
-h2:sec-impl-5 6.5 局部修正算子的求解
-h2:sec-impl-6 6.6 粗系统组装与求解
-h2:sec-impl-7 6.7 参考解与误差计算
-h1:sec-exp 7. 数值实验与结果分析
-h2:sec-exp-1 7.1 实验设置
-h2:sec-exp-2 7.2 误差收敛性测试
-h2:sec-exp-3 7.3 局部化参数  的影响
-h2:sec-exp-4 7.4 可视化展示
-h2:sec-exp-5 7.5 计算时间与稀疏性分析
-h1:sec-conclusion 8. 结论
-h1:sec-appendix 附录（可选）
-h2:sec-app-a A. 部分引理证明细节
-h2:sec-app-b B. MATLAB 代码清单
+h1:intro 摘要
+h1:chap-1 第一章 绪论
+h2:chap-1-1 1.1 研究背景与意义
+h2:chap-1-2 1.2 多尺度数值计算方法综述
+h2:chap-1-3 1.3 局部正交分解（LOD）方法简介
+h2:chap-1-4 1.4 本文主要研究内容与结构安排
+h1:chap-2 第二章 椭圆型多尺度问题的数学描述
+h2:chap-2-1 2.1 模型问题定义
+h2:chap-2-2 2.2 标准有限元法的局限性
+h2:chap-2-3 2.3 能量空间与有限元空间定义
+h1:chap-3 第三章 二维LOD方法的理论框架
+h2:chap-3-1 3.1 尺度的分解与拟插值算子
+h2:chap-3-2 3.2 -正交化与理想多尺度空间
+h2:chap-3-3 3.3 理想LOD方法的误差分析
+h1:chap-4 第四章 数值校正子的局部化技术
+h2:chap-4-1 4.1 校正子的指数衰减特性
+h2:chap-4-2 4.2 局部化校正算子与单元补片（Patches）
+h2:chap-4-3 4.3 局部化正交分解方法（LOD）的离散格式
+h1:chap-5 第五章 算法设计与MATLAB程序实现
+h2:chap-5-1 5.1 算法总体流程与数据结构
+h2:chap-5-2 5.2 核心模块实现细节
+h2:chap-5-3 5.3 校正子问题的鞍点求解格式
+h2:chap-5-4 5.4 粗网格刚度矩阵的组装与求解
+h1:chap-6 第六章 数值算例与应用分析
+h2:chap-6-1 6.1 非周期高反差系数问题算例
+h2:chap-6-2 6.2 收敛性验证
+h2:chap-6-3 6.3 结果可视化与解释
+h1:chap-7 第七章 结论与展望
+h2:chap-7-1 7.1 本文总结
+h2:chap-7-2 7.2 未来研究方向
+h1:appendix-code 附录：主要源程序清单
 

@@ -36,46 +36,6 @@
 }{% if KOMA class
   \KOMAoptions{parskip=half}}
 \makeatother
-\usepackage{color}
-\usepackage{fancyvrb}
-\newcommand{\VerbBar}{|}
-\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
-\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
-% Add ',fontsize=\small' for more characters per line
-\usepackage{framed}
-\definecolor{shadecolor}{RGB}{248,248,248}
-\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
-\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
-\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
-\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
-\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
-\newcommand{\BuiltInTok}[1]{#1}
-\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
-\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
-\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
-\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
-\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
-\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
-\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
-\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
-\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
-\newcommand{\ExtensionTok}[1]{#1}
-\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
-\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
-\newcommand{\ImportTok}[1]{#1}
-\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
-\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
-\newcommand{\NormalTok}[1]{#1}
-\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
-\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
-\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
-\newcommand{\RegionMarkerTok}[1]{#1}
-\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
-\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
-\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
-\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
-\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
-\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
 \usepackage{longtable,booktabs,array}
 \usepackage{calc} % for calculating minipage widths
 % Correct order of tables after \paragraph or \subparagraph
@@ -130,12 +90,12 @@
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
 \urlstyle{same}
 \hypersetup{
-  pdftitle={中文文章模板},
+  pdftitle={二维多尺度问题正交分解方法及其程序实现},
   pdfauthor={李东风},
   hidelinks,
   pdfcreator={LaTeX via pandoc}}
 
-\title{中文文章模板}
+\title{二维多尺度问题正交分解方法及其程序实现}
 \author{李东风}
 \date{2030年6月5日}
 
@@ -148,294 +108,113 @@
 }
 \section{摘要}\label{intro}
 
-R软件的bookdown扩展包是R Markdown的增强版，
-支持自动目录、文献索引、公式编号与引用、定理编号与引用、图表自动编号与引用等功能，
-可以作为LaTeX的一种替代解决方案，
-在制作用R进行数据分析建模的技术报告时，
-可以将报告文字、R程序、文字性结果、表格、图形都自动地融合在最后形成的网页或者PDF文件中。
+本文围绕二维多尺度椭圆型问题的局部正交分解方法展开研究，聚焦理论构建与程序实现。此处可进一步补充研究背景、研究目标、技术路线、核心结果与结论，形成完整摘要正文。
 
-Bookdown使用的设置比较复杂，
-对初学者不够友好。
-这里制作了一些模板，
-用户只要解压缩打包的文件，
-对某个模板进行修改填充就可以变成自己的中文图书或者论文。
-Bookdown的详细用法参见\url{https://bookdown.org/yihui/bookdown/}，
-在李东风的\href{http://www.math.pku.edu.cn/teachers/lidf/docs/Rbook/html/_Rbook/index.html}{《统计软件教程》}也有部分介绍。
+\section{第一章 绪论}\label{chap-1}
 
-\texttt{index.Rmd}文件的内容包含一些常用功能的示例，
-用户可以在编辑器中打开此文件参考其中的做法。
+\subsection{1.1 研究背景与意义}\label{chap-1-1}
 
-Bookdown如果输出为网页，
-其中的数学公式需要MathJax程序库的支持，
-用如下数学公式测试浏览器中数学公式显示是否正常：
+本节用于阐述现代复合材料、多孔介质等介质在微观尺度上的非均匀性，说明其对数值模拟精度与计算代价提出的挑战，并明确本文研究的现实意义与理论价值。
 
-\[
-\text{定积分} = \int_a^b f(x) \,dx
-\]
+\subsection{1.2 多尺度数值计算方法综述}\label{chap-1-2}
 
-如果显示不正常，
-可以在公式上右键单击，
-选择``Math Settings--Math Renderer''，
-依次使用改成``Common HTML''，``SVG''等是否可以变成正常显示。
-PDF版本不存在这样的问题。
+本节用于综述同质化理论、多尺度有限元法与变分多尺度法的主要思路、适用条件及局限，为后续引入LOD方法提供比较基础。
 
-\section{安装设置}\label{usage-ins}
+\subsection{1.3 局部正交分解（LOD）方法简介}\label{chap-1-3}
 
-使用RStudio软件完成编辑和转换功能。
-在RStudio中，安装bookdown等必要的扩展包。
+本节用于说明LOD方法的核心思想，重点强调其对周期性假设与严格尺度分离条件的弱依赖特性。
 
-本模板在安装之前是一个打包的zip文件，
-在适当位置解压（例如，在\texttt{C:/myproj}下），
-得到\texttt{MathJax}, \texttt{Books/Cbook}, \texttt{Books/Carticle}等子目录。
-本模板在\texttt{Books/Carticle}中。
+\subsection{1.4 本文主要研究内容与结构安排}\label{chap-1-4}
 
-为了利用模板制作自己的中文论文，
-将\texttt{Books/CArticle}制作一个副本，
-改成适当的子目录名，如\texttt{Books/Myarticle}。
+本节用于概述本文的研究问题、技术路线、程序实现框架以及各章节之间的逻辑关系。
 
-打开RStudio软件，
-选选单``File - New Project - Existing Directory''，
-选中\texttt{Books/Myarticle}子目录，确定。
-这样生成一本书对应的R project（项目）。
+\section{第二章 椭圆型多尺度问题的数学描述}\label{chap-2}
 
-为了将模板内容替换成自己的内容，
-只要修改\texttt{index.Rmd}文件，
-删除原来的不必要的内容，
-替换成自己的内容。
+\subsection{2.1 模型问题定义}\label{chap-2-1}
 
-后面的§\ref{usage-gitbook} 和§\ref{usage-pdfbook} 给出了将当前的书转换为网页和PDF的命令，
-复制粘贴这些命令到RStudio命令行可以进行转换。
+本节用于给出具有强非均匀、高震荡系数的二维泊松方程模型，并写出对应弱形式与边界条件设定。
 
-\section{编写自己的内容}\label{usage-writing}
+\subsection{2.2 标准有限元法的局限性}\label{chap-2-2}
 
-\subsection{文档结构}\label{usage-writing-struct}
+本节用于展示标准有限元法在未解析尺度（Pre-asymptotic regime）下的精度失效现象，并说明引入多尺度方法的必要性。
 
-所有的内容都在\texttt{index.Rmd}中。
-每节用一个井号（\texttt{\#}）引入的节标题，
-小节标题用两个个井号开始。
-标题后面都有大括号内以井号开头的标签，
-标签仅用英文大小写字母和减号。
+\subsection{2.3 能量空间与有限元空间定义}\label{chap-2-3}
 
-\subsection{图形自动编号}\label{usage-writing-fig}
+本节用于定义连续能量空间、粗网格空间 \(V_H\) 与细网格参考空间 \(V_h\)，为后续尺度分解与误差分析做准备。
 
-用R代码段生成的图形，
-只要具有代码段标签，
-且提供代码段选项\texttt{fig.cap="图形的说明文字"}，
-就可以对图形自动编号，
-并且可以用如\texttt{\textbackslash{}@ref(fig:label)}的格式引用图形。
-如：
+\section{第三章 二维LOD方法的理论框架}\label{chap-3}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{plot}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\DecValTok{10}\NormalTok{, }\AttributeTok{main=}\StringTok{"程序生成的测试图形"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
+\subsection{3.1 尺度的分解与拟插值算子}\label{chap-3-1}
 
-\begin{figure}
-\centering
-\pandocbounded{\includegraphics[keepaspectratio]{_main_files/_main_files/figure-latex/u-w-f-ex01-1.pdf}}
-\caption{\label{fig:u-w-f-ex01}图形说明文字}
-\end{figure}
+本节用于定义拟插值算子 \(I_H\) 及其关键性质，并建立解空间由粗尺度空间与细尺度核空间 \(W\) 构成的分解关系。
 
-引用如：参见图\ref{fig:u-w-f-ex01}。
-引用中的\texttt{fig:}是必须的。
+\subsection{\texorpdfstring{3.2 \(a\)-正交化与理想多尺度空间}{3.2 a-正交化与理想多尺度空间}}\label{chap-3-2}
 
-在通过LaTeX转换的PDF结果中，
-图形是浮动的。
+本节用于构造相对于双线性型 \(a(\cdot,\cdot)\) 的正交补空间 \(V_H^{ms}\)，并给出校正算子 \(\mathcal{C}\) 的定义与作用机制。
 
-\subsection{表格自动编号}\label{usage-writing-tab}
+\subsection{3.3 理想LOD方法的误差分析}\label{chap-3-3}
 
-用R代码\texttt{knitr::kable()}生成的表格，
-只要具有代码段标签，
-并且在\texttt{knitr::kable()}调用时加选项\texttt{caption="表格的说明文字"}，
-就可以对表格自动编号，
-并且可以用如\texttt{\textbackslash{}@ref(tab:label)}的格式引用表格。
-如：
+本节用于讨论理想LOD方法在能量模与 \(L^2\) 模下的收敛性质与最优阶结果。
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{d }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}\StringTok{"自变量"}\OtherTok{=}\DecValTok{1}\SpecialCharTok{:}\DecValTok{10}\NormalTok{, }\StringTok{"因变量"}\OtherTok{=}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\DecValTok{10}\NormalTok{)}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{)}
-\NormalTok{knitr}\SpecialCharTok{::}\FunctionTok{kable}\NormalTok{(d, }\AttributeTok{caption=}\StringTok{"表格说明文字"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
+\section{第四章 数值校正子的局部化技术}\label{chap-4}
 
-\begin{table}
+\subsection{4.1 校正子的指数衰减特性}\label{chap-4-1}
 
-\caption{\label{tab:u-w-tab-ex01}表格说明文字}
-\centering
-\begin{tabular}[t]{r|r}
-\hline
-自变量 & 因变量\\
-\hline
-1 & 1\\
-\hline
-2 & 4\\
-\hline
-3 & 9\\
-\hline
-4 & 16\\
-\hline
-5 & 25\\
-\hline
-6 & 36\\
-\hline
-7 & 49\\
-\hline
-8 & 64\\
-\hline
-9 & 81\\
-\hline
-10 & 100\\
-\hline
-\end{tabular}
-\end{table}
+本节用于说明并证明校正子在空间上的指数衰减规律，作为局部化算法有效性的理论依据。
 
-引用如：参见表\ref{tab:u-w-tab-ex01}。
-引用中的\texttt{tab:}是必须的。
+\subsection{4.2 局部化校正算子与单元补片（Patches）}\label{chap-4-2}
 
-在通过LaTeX转换的PDF结果中，
-表格是浮动的。
+本节用于构造基于单元补片 \(N_\ell(T)\) 的局部化空间 \(W_\ell(T)\)，并讨论局部化参数 \(\ell\) 在精度与计算量之间的权衡关系。
 
-\subsection{数学公式编号}\label{usage-writing-math}
+\subsection{4.3 局部化正交分解方法（LOD）的离散格式}\label{chap-4-3}
 
-不需要编号的公式，
-仍可以按照一般的Rmd文件中公式的做法。
-需要编号的公式，
-直接写在\texttt{\textbackslash{}begin\{align\}}和\texttt{\textbackslash{}end\{align\}}之间，
-不需要编号的行在末尾用\texttt{\textbackslash{}nonumber}标注。
-需要编号的行用\texttt{(\textbackslash{}\#eq:mylabel)}添加自定义标签，
-如
+本节用于给出局部化后LOD方法的离散求解格式与实现要点。
 
-\begin{align}
-\Sigma =&  (\sigma_{ij})_{n\times n} \nonumber \\
-=& E[(\boldsymbol{X} - \boldsymbol{\mu}) (\boldsymbol{X} - \boldsymbol{\mu})^T ] 
-\label{eq:var-mat-def}
-\end{align}
+\section{第五章 算法设计与MATLAB程序实现}\label{chap-5}
 
-引用如：协方差定义见\eqref{eq:var-mat-def}。
+\subsection{5.1 算法总体流程与数据结构}\label{chap-5-1}
 
-\subsection{文献引用与文献列表}\label{ux6587ux732eux5f15ux7528ux4e0eux6587ux732eux5217ux8868}
+本节用于结合 \texttt{code.md} 的主脚本逻辑，说明整体算法流程、输入输出关系与核心数据结构。
 
-将所有文献用bib格式保存为一个\texttt{.bib}文献库，
-如模板中的样例文件\texttt{mybib.bib}。
-可以用JabRef软件来管理这样的文献库，
-许多其它软件都可以输出这样格式的文件库。
+\subsection{5.2 核心模块实现细节}\label{chap-5-2}
 
-为了引用某一本书，
-用如：参见\autocite{Wichmann1982:RNG}。
+本节用于描述网格生成与加密（\texttt{refineMesh} 红化加密）、拟插值算子的矩阵表示构造方法，以及基于邻接关系的局部补片定位算法。
 
-被引用的文献将出现在一章末尾以及全书的末尾，
-对PDF输出则仅出现在全书末尾。
+\subsection{5.3 校正子问题的鞍点求解格式}\label{chap-5-3}
 
-\section{转换}\label{usage-output}
+本节用于说明局部约束变分问题的鞍点系统构造、求解策略，以及校正算子矩阵与多尺度基函数的组装过程。
 
-\subsection{转换为网页}\label{usage-gitbook}
+\subsection{5.4 粗网格刚度矩阵的组装与求解}\label{chap-5-4}
 
-用如下命令将整本书转换成一个网页，
-称为gitbook格式：
+本节用于给出粗网格层面的系统组装方法、求解流程与复杂度讨论。
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{bookdown}\SpecialCharTok{::}\FunctionTok{render\_book}\NormalTok{(}\StringTok{"index.Rmd"}\NormalTok{, }
-  \AttributeTok{output\_format=}\StringTok{"bookdown::gitbook"}\NormalTok{, }\AttributeTok{encoding=}\StringTok{"UTF{-}8"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
+\section{第六章 数值算例与应用分析}\label{chap-6}
 
-为查看结果，
-在\texttt{\_book}子目录中双击其中的\texttt{\_main.html}文件，
-就可以在网络浏览器中查看转换的结果。
-重新编译后应该点击``刷新''图标。
+\subsection{6.1 非周期高反差系数问题算例}\label{chap-6-1}
 
-网页可以通过Chrome网络浏览器中的``打印''功能转换为PDF。
-选菜单项``打印''，
-选择一个打印到PDF的打印机，
-如``另存为PDF''打印机，
-或Windows操作系统的``Microsoft print to PDF''打印机，
-在``更多设置''中选择缩放率为90\%，
-点击``保存''按钮就可以将网页转换成PDF格式。
+本节用于设置非周期随机震荡系数算例，展示方法在复杂多尺度介质下的适用性。
 
-\subsection{通过LaTeX生成PDF}\label{usage-pdfbook}
+\subsection{6.2 收敛性验证}\label{chap-6-2}
 
-Bookdown可以借助TinyTeX编译软件将文章转换成一个PDF文件。
-这需要用户对LaTeX有一定的了解，
-否则一旦出错，
-就完全不知道如何解决。
-用户如果需要进行LaTeX定制，
-可修改模板中的\texttt{preamble.tex}文件。
+本节用于比较不同局部化参数 \(\ell\) 下的误差表现，并与标准有限元法（FEM）进行精度与效率对比。
 
-转换为PDF的命令如下：
+\subsection{6.3 结果可视化与解释}\label{chap-6-3}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{bookdown}\SpecialCharTok{::}\FunctionTok{render\_book}\NormalTok{(}\StringTok{"index.Rmd"}\NormalTok{,}
-  \AttributeTok{output\_format=}\StringTok{"bookdown::pdf\_book"}\NormalTok{, }\AttributeTok{encoding=}\StringTok{"UTF{-}8"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
+本节用于展示多尺度数值解与细尺度参考解的可视化结果，并给出误差来源与物理意义分析。
 
-在转换过程中可能需要联网下载所需的软件或者格式包。
-在\texttt{\_book}子目录中找到\texttt{\_main.pdf}文件，
-这是转换的结果。
+\section{第七章 结论与展望}\label{chap-7}
 
-Bookdown使用rmarkdown扩展包和pandoc软件、LaTeX软件，
-在R中运行如下命令可以自动安装LaTeX软件，
-称为TinyTeX:
+\subsection{7.1 本文总结}\label{chap-7-1}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{install.packages}\NormalTok{(}\StringTok{\textquotesingle{}tinytex\textquotesingle{}}\NormalTok{)}
-\NormalTok{tinytex}\SpecialCharTok{::}\FunctionTok{install\_tinytex}\NormalTok{()}
-\end{Highlighting}
-\end{Shaded}
+本节用于总结LOD方法在二维多尺度问题中的主要优势、实现结果与实验结论。
 
-安装过程需要从国外的服务器下载许多文件，
-在国内的网络环境下有可能因为网络超时而失败。
-如果安装成功，
-TinyTeX软件包在MS Windows系统中一般会安装在
-\texttt{C:\textbackslash{}Users\textbackslash{}用户名\textbackslash{}AppData\textbackslash{}Roaming\textbackslash{}TinyTeX}目录中，
-其中``用户名''应替换成系统当前用户名。
-如果需要删除TinyTeX软件包，
-只要直接删除那个子目录就可以。
+\subsection{7.2 未来研究方向}\label{chap-7-2}
 
-为了判断TinyTeX是否安装成功，
-在RStudio中运行
+本节用于讨论该方法在特征值问题、抛物线问题及随机同质化方向上的潜在扩展。
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{tinytex}\SpecialCharTok{::}\FunctionTok{is\_tinytex}\NormalTok{()}
-\end{Highlighting}
-\end{Shaded}
+\section{附录：主要源程序清单}\label{appendix-code}
 
-结果应为\texttt{TRUE},
-出错或者结果为\texttt{FALSE}都说明安装不成功。
-
-\subsection{上传到网站}\label{usage-website}
-
-如果书里面没有数学公式，
-则上传到网站就只要将\texttt{\_book}子目录整个地用ftp软件传送到自己的网站主目录下的某个子目录即可。
-但是，为了支持数学公式，就需要进行如下的目录结构设置：
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\tightlist
-\item
-  设自己的网站服务器目录为\texttt{/home/abc}，
-  将MathJax目录上传到这个目录中。
-\item
-  在\texttt{/home/abc}中建立新目录\texttt{Books/Mybook}。
-\item
-  将\texttt{\_book}子目录上传到\texttt{/home/abc/Books/Mybook}中。
-\item
-  这时网站链接可能类似于\texttt{http://dept.univ.edu.cn/\textasciitilde{}abc/Books/Mybooks/\_book/index.html},
-  具体链接地址依赖于服务器名称与主页所在的主目录名称。
-\end{enumerate}
-
-如果有多本书，
-\texttt{MathJax}仅需要上传一次。
-因为\texttt{MathJax}有三万多个文件，
-所以上传\texttt{MathJax}会花费很长时间。
-
-\textbf{注意}：下面一行用于生成文献目录标题，
-不要删去下面的行：
+本附录用于整理本文实现所涉及的关键程序模块、函数清单与调用关系，后续可按模块补充源码片段与注释说明。
 
 \printbibliography
 
