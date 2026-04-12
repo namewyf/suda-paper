@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>lod_integral.m 改动说明</title>
+  <style>
+    :root {
+      --bg: #f7f0e4;
+      --paper: rgba(255, 250, 242, 0.88);
+      --ink: #1f2a30;
+      --muted: #5f6b70;
+      --accent: #bf5a36;
+      --accent-soft: #f1d4c2;
+      --line: rgba(31, 42, 48, 0.12);
+      --ok: #2f7d5b;
+      --warn: #9a4d27;
+      --shadow: 0 18px 45px rgba(76, 51, 38, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", "STSong", serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(191, 90, 54, 0.14), transparent 28%),
+        radial-gradient(circle at 85% 15%, rgba(47, 125, 91, 0.12), transparent 24%),
+        linear-gradient(135deg, #f9f2e8 0%, #efe3d3 48%, #f8f4ec 100%);
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(31, 42, 48, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(31, 42, 48, 0.03) 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events: none;
+      mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), transparent 92%);
+    }
+
+    .page {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 48px 0 64px;
+    }
+
+    .hero {
+      background: linear-gradient(145deg, rgba(255, 252, 247, 0.96), rgba(248, 238, 225, 0.9));
+      border: 1px solid rgba(191, 90, 54, 0.18);
+      border-radius: 28px;
+      padding: 34px 28px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+      animation: rise 700ms ease-out both;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -30px;
+      top: -30px;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(191, 90, 54, 0.16), transparent 68%);
+    }
+
+    .eyebrow {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(191, 90, 54, 0.1);
+      color: var(--accent);
+      font-size: 0.86rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1, h2, h3 {
+      margin: 0;
+      font-weight: 700;
+    }
+
+    h1 {
+      margin-top: 14px;
+      font-size: clamp(2rem, 4vw, 3.8rem);
+      line-height: 0.98;
+      max-width: 10ch;
+    }
+
+    .hero p {
+      margin: 16px 0 0;
+      max-width: 60ch;
+      font-size: 1.06rem;
+      line-height: 1.8;
+      color: var(--muted);
+    }
+
+    .meta {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 24px;
+    }
+
+    .meta-card {
+      padding: 16px 18px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.58);
+      border: 1px solid var(--line);
+      backdrop-filter: blur(6px);
+    }
+
+    .meta-card strong {
+      display: block;
+      font-size: 0.88rem;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .meta-card span {
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+
+    section {
+      margin-top: 26px;
+      animation: rise 850ms ease-out both;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .panel {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .panel h2 {
+      font-size: 1.55rem;
+      margin-bottom: 10px;
+    }
+
+    .panel p {
+      margin: 0;
+      line-height: 1.8;
+      color: var(--muted);
+    }
+
+    .timeline {
+      display: grid;
+      gap: 16px;
+      margin-top: 18px;
+    }
+
+    .step {
+      padding: 18px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.62);
+    }
+
+    .step h3 {
+      font-size: 1.08rem;
+      margin-bottom: 10px;
+    }
+
+    .step p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.75;
+    }
+
+    .badge {
+      display: inline-block;
+      margin-bottom: 10px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      letter-spacing: 0.04em;
+      background: var(--accent-soft);
+      color: var(--warn);
+    }
+
+    .diff-list {
+      display: grid;
+      gap: 16px;
+      margin-top: 18px;
+    }
+
+    .diff-item {
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.68);
+    }
+
+    .diff-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px 18px;
+      background: linear-gradient(90deg, rgba(191, 90, 54, 0.12), rgba(191, 90, 54, 0.02));
+      border-bottom: 1px solid var(--line);
+    }
+
+    .diff-head h3 {
+      font-size: 1.02rem;
+    }
+
+    .diff-body {
+      padding: 18px;
+    }
+
+    .compare {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .code-box {
+      padding: 14px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: rgba(252, 248, 242, 0.92);
+    }
+
+    .code-box strong {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--ink);
+      font-size: 0.92rem;
+    }
+
+    pre {
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: "SFMono-Regular", "Menlo", "Consolas", monospace;
+      font-size: 0.9rem;
+      line-height: 1.65;
+      color: #233038;
+    }
+
+    .plain-list {
+      margin: 16px 0 0;
+      padding-left: 18px;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .plain-list li + li {
+      margin-top: 8px;
+    }
+
+    .callout {
+      margin-top: 18px;
+      padding: 18px 20px;
+      border-radius: 18px;
+      background: linear-gradient(90deg, rgba(47, 125, 91, 0.09), rgba(47, 125, 91, 0.03));
+      border: 1px solid rgba(47, 125, 91, 0.18);
+    }
+
+    .callout strong {
+      color: var(--ok);
+    }
+
+    .footer {
+      margin-top: 26px;
+      padding: 22px 24px;
+      border-radius: 22px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.58);
+      color: var(--muted);
+      line-height: 1.8;
+      box-shadow: var(--shadow);
+    }
+
+    @keyframes rise {
+      from {
+        opacity: 0;
+        transform: translateY(18px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 900px) {
+      .grid,
+      .compare,
+      .meta {
+        grid-template-columns: 1fr;
+      }
+
+      .page {
+        width: min(100% - 20px, 1120px);
+        padding-top: 24px;
+      }
+
+      .hero,
+      .panel {
+        padding: 22px 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <span class="eyebrow">MATLAB 改动解读</span>
+      <h1>为什么要把<br>符号积分<br>改成数值积分？</h1>
+      <p>
+        这个页面专门解释 <code>lod_integral.m</code> 相比旧版代码到底改了哪里。重点不是“看起来改了几行”，而是理解：
+        原来在做什么，新的写法为什么更稳、更好维护，而且更不容易因为手动改漏而算错。
+      </p>
+      <div class="meta">
+        <div class="meta-card">
+          <strong>核心变化</strong>
+          <span>LOD 部分把符号积分 <code>syms/int/subs</code> 改成了数值积分 <code>integral</code>。</span>
+        </div>
+        <div class="meta-card">
+          <strong>这样改的原因</strong>
+          <span>更通用，更不依赖手工推公式，也避免系数函数改了却忘记同步另一处。</span>
+        </div>
+        <div class="meta-card">
+          <strong>一句话理解</strong>
+          <span>从“先写出解析表达式再代值”改成“需要多少就现场数值算多少”。</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid">
+      <article class="panel">
+        <h2>先说结论</h2>
+        <p>
+          <code>lod_integral.m</code> 的主体框架没有变，求解的还是同一个一维 LOD 多尺度有限元问题。
+          真正变化集中在两件事：一个是单元载荷向量怎么计算，另一个是多尺度基函数在细网格点上的值怎么得到。
+        </p>
+        <div class="callout">
+          <strong>通俗比喻：</strong>
+          旧版像是“先把整道题完整手算出公式，再把数代进去”；新版像是“不要先推一大串公式，直接让计算器按定义去算数值”。对于复杂系数函数，后者通常更省心。
+        </div>
+      </article>
+
+      <article class="panel">
+        <h2>没有改的部分</h2>
+        <p>
+          这些内容基本保持不变：求解区间、网格大小、刚度矩阵的主结构、最后把粗网格 LOD 解和细网格 FEM 解画在一起比较。
+          所以你可以把这次修改理解成“只换发动机内部的一部分零件，车的外形和功能没变”。
+        </p>
+        <ul class="plain-list">
+          <li>问题模型没变，还是同一个扩散方程。</li>
+          <li>LOD 的单元刚度矩阵公式没变。</li>
+          <li>最后重建多尺度数值解并画图的流程没变。</li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="panel">
+      <h2>改动 1：单元载荷向量从“符号积分”改成“数值积分”</h2>
+      <div class="diff-list">
+        <div class="diff-item">
+          <div class="diff-head">
+            <h3>原来怎么做</h3>
+            <span class="badge">旧版写法</span>
+          </div>
+          <div class="diff-body">
+            <p>
+              旧版先定义符号变量 <code>x</code> 和 <code>t</code>，再写出
+              <code>f1 = ∫ A<sup>-1</sup>(t) dt</code>，
+              然后继续对它做一次积分，得到载荷向量。
+            </p>
+            <div class="compare">
+              <div class="code-box">
+                <strong>旧版核心代码</strong>
+                <pre>syms x t
+A_eps_inv_t = ...
+f1 = int(A_eps_inv_t, t, x1, x);
+F_e = [int(1 - f1/c, x, x1, x2);
+       int(f1/c, x, x1, x2)];</pre>
+              </div>
+              <div class="code-box">
+                <strong>直白理解</strong>
+                <pre>先求一个“中间公式”
+再把这个公式继续积分
+最后才得到两个分量</pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="diff-item">
+          <div class="diff-head">
+            <h3>现在怎么做</h3>
+            <span class="badge">新版写法</span>
+          </div>
+          <div class="diff-body">
+            <p>
+              新版不再让 MATLAB 先推符号公式，而是直接利用换序后的单积分表达式，用 <code>integral</code> 算数值。
+            </p>
+            <div class="compare">
+              <div class="code-box">
+                <strong>新版核心代码</strong>
+                <pre>dbl_int = integral(@(t) A_eps_inv(t) .* (x2 - t), x1, x2);
+F_e = [he - dbl_int/c;
+       dbl_int/c];</pre>
+              </div>
+              <div class="code-box">
+                <strong>直白理解</strong>
+                <pre>不先写解析公式
+而是直接按定义去算
+省掉中间那一大段符号推导</pre>
+              </div>
+            </div>
+            <ul class="plain-list">
+              <li>优点 1：代码更短，更容易读。</li>
+              <li>优点 2：系数函数一改，数值积分会自动跟着改，不容易漏。</li>
+              <li>优点 3：复杂函数时，符号积分不一定好使，数值积分更稳妥。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>改动 2：细网格上的基函数值不再用 <code>subs</code> 代入，而是逐点累积积分</h2>
+      <div class="timeline">
+        <div class="step">
+          <h3>旧版思路</h3>
+          <p>
+            旧版先把
+            <code>f1(x) = ∫<sub>x1</sub><sup>x</sup> A<sup>-1</sup>(t) dt</code>
+            这个符号表达式求出来，再用 <code>subs</code> 把每个细网格点代进去，于是得到左、右基函数的值。
+          </p>
+        </div>
+        <div class="step">
+          <h3>新版思路</h3>
+          <p>
+            新版对每个细网格点 <code>xi</code>，直接算
+            <code>∫<sub>x1</sub><sup>xi</sup> A<sup>-1</sup>(t) dt</code>。
+            算完后除以 <code>c</code>，就能得到右侧基函数值；再用 <code>1 - 这个值</code> 得到左侧基函数值。
+          </p>
+        </div>
+        <div class="step">
+          <h3>为什么这样更自然</h3>
+          <p>
+            你真正需要的其实只是“这些点上的数值”，而不是“一个很长的符号公式”。既然目标只是点值，那就直接去算点值，思路更贴近最终用途。
+          </p>
+        </div>
+      </div>
+      <div class="compare" style="margin-top: 18px;">
+        <div class="code-box">
+          <strong>旧版</strong>
+          <pre>LeftBasisValue = 1 - double(subs(f1, x, x1+h:h:x2-h)/c);
+RightBasisValue = double(subs(f1, x, x1+h:h:x2-h)/c);</pre>
+        </div>
+        <div class="code-box">
+          <strong>新版</strong>
+          <pre>for k = 1:(ratio-1)
+    xi = x_fine_local(k);
+    cum_int_local(k) = integral(A_eps_inv, x1, xi);
+end
+LeftBasisValue  = 1 - cum_int_local / c;
+RightBasisValue = cum_int_local / c;</pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid">
+      <article class="panel">
+        <h2>为什么说新版更不容易出错</h2>
+        <ul class="plain-list">
+          <li>旧版需要手动再写一遍 <code>A_eps_inv_t</code> 的表达式。如果你改了上面的 <code>A_eps</code>，却忘了改这里，就会前后不一致。</li>
+          <li>新版统一使用函数句柄 <code>A_eps_inv</code>。只要系数函数改了，所有积分都会自动用新的系数。</li>
+          <li>旧版依赖符号工具箱的处理能力；新版主要依赖数值积分，对复杂函数更稳。</li>
+        </ul>
+      </article>
+
+      <article class="panel">
+        <h2>为什么没有改动刚度矩阵主公式</h2>
+        <p>
+          因为刚度矩阵那部分本来就已经是数值积分形式：
+          先算 <code>c = ∫ A_eps_inv</code>，再写成
+          <code>(1/c) [1 -1; -1 1]</code>。
+          这部分本身已经够直接了，所以没必要再动。
+        </p>
+        <div class="callout">
+          <strong>理解重点：</strong>
+          这次修改不是推翻原方法，而是把原来最容易卡住、最依赖符号推导的两处，换成了更实际的数值实现。
+        </div>
+      </article>
+    </section>
+
+    <section class="panel">
+      <h2>如果把这次修改压缩成一句人话</h2>
+      <p>
+        <strong>旧版：</strong>先把数学表达式“完整写出来”，再代点进去。<br>
+        <strong>新版：</strong>只要最后需要数值，就直接数值计算，不绕一圈去求符号表达式。
+      </p>
+      <ul class="plain-list">
+        <li>对读代码的人来说，更容易看懂它到底在算什么。</li>
+        <li>对以后改系数函数的人来说，更不容易漏改某一处。</li>
+        <li>对 MATLAB 来说，通常也更符合实际数值计算的工作方式。</li>
+      </ul>
+    </section>
+
+    <section class="footer">
+      这个页面对应的说明对象是 <code>/Users/yufei/Documents/论文/lod_integral.m</code>。
+      如果你还想继续扩展，我可以下一步把这个网页再加上一栏“和 <code>Chap2_4_LOD_Solution.m</code> 的逐行对应关系”，或者直接把关键公式也画成更容易看的流程图。
+    </section>
+  </main>
+</body>
+</html>
