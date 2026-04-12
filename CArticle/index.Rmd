@@ -441,7 +441,19 @@ SHLOD0 = ((G0' * (cg2dgh' * Shdg)) * cg2dgh) * G0;
 
 ## 结果可视化与解释 {#chap-6-3}
 
-图3.2与图3.3对比了标准有限元分解与LOD分解。标准有限元粗尺度部分$\mathcal{I}_H u$仅能捕获光滑趋势，所有微观震荡均被归入细尺度。而LOD的粗尺度部分$u_H^{\mathrm{ms}}$本身已包含了与真解高度一致的微观震荡模式，其光滑包络与真解几乎重合。这一可视化直观印证了LOD多尺度基函数编码微观信息的能力。
+图\@ref(fig:fig6-3-reference-solution)、图\@ref(fig:fig6-3-lod-full)与图\@ref(fig:fig6-3-lod-fe-part)分别展示了细网格参考解、LOD全近似解和LOD近似解中的有限元部分。可以看到，LOD全近似解在整体形貌和局部震荡特征上与参考解高度一致；而有限元部分主要反映宏观包络信息。这一直观对比说明，LOD通过多尺度基函数把细尺度信息有效编码到粗尺度离散空间中。
+
+```{r fig6-3-reference-solution, fig.cap='细网格参考解 $u_h$（$h=2^{-7.5}$）', fig.align='center', out.width='72%'}
+knitr::include_graphics("figures/fig6-reference-solution.png")
+```
+
+```{r fig6-3-lod-full, fig.cap='LOD全近似解 $u_{H,\\ell}^{ms,h}$（$h=2^{-7.5}, H=2^{-1.5}, \\ell=1$）', fig.align='center', out.width='72%'}
+knitr::include_graphics("figures/fig6-lod-full-approximation.png")
+```
+
+```{r fig6-3-lod-fe-part, fig.cap='LOD近似解中的有限元部分 $u_{H,\\ell}^{h}$（$h=2^{-7.5}, H=2^{-1.5}, \\ell=1$）', fig.align='center', out.width='72%'}
+knitr::include_graphics("figures/fig6-lod-fe-part.png")
+```
 
 ---
 

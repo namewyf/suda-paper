@@ -29,6 +29,9 @@ h1:chap-6 数值算例与应用分析
 h2:chap-6-1 非周期高反差系数问题算例
 h2:chap-6-2 收敛性验证
 h2:chap-6-3 结果可视化与解释
+fig:fig6-3-reference-solution 细网格参考解 $u_h$（$h=2^{-7.5}$）
+fig:fig6-3-lod-full LOD全近似解 $u_{H,\\ell}^{ms,h}$（$h=2^{-7.5}, H=2^{-1.5}, \\ell=1$）
+fig:fig6-3-lod-fe-part LOD近似解中的有限元部分 $u_{H,\\ell}^{h}$（$h=2^{-7.5}, H=2^{-1.5}, \\ell=1$）
 h1:chap-7 结论与展望
 h2:chap-7-1 本文总结
 h2:chap-7-2 未来研究方向

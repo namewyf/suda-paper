@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999998 (TeX Live 2026) (preloaded format=xelatex 2026.4.13)  13 APR 2026 03:25
+This is XeTeX, Version 3.141592653-2.6-0.999998 (TeX Live 2026) (preloaded format=xelatex 2026.4.13)  13 APR 2026 03:37
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1401,11 +1401,19 @@ File: figures/fig3-1-diffusion-coefficient.png Graphic file (type bmp)
 [7] [8] [9] [10] [11]
 LaTeX Font Info:    Font shape `TU/STFangsong(0)/m/n' will be
 (Font)              scaled to size 10.23074pt on input line 512.
-[12] [13]
+[12]
+File: figures/fig6-reference-solution.png Graphic file (type bmp)
+<figures/fig6-reference-solution.png>
+[13] [14]
+File: figures/fig6-lod-full-approximation.png Graphic file (type bmp)
+<figures/fig6-lod-full-approximation.png>
+File: figures/fig6-lod-fe-part.png Graphic file (type bmp)
+<figures/fig6-lod-fe-part.png>
+[15] [16]
 
-LaTeX Warning: Empty bibliography on input line 602.
+LaTeX Warning: Empty bibliography on input line 647.
 
-[14] (./_main.aux)
+[17] (./_main.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2022/07/14>
@@ -1419,12 +1427,12 @@ Package logreq Info: Writing requests to '_main.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 28426 strings out of 470015
- 570246 string characters out of 5474702
- 1654617 words of memory out of 5000000
- 56793 multiletter control sequences out of 15000+600000
+ 28486 strings out of 470015
+ 572524 string characters out of 5474702
+ 1654825 words of memory out of 5000000
+ 56850 multiletter control sequences out of 15000+600000
  637035 words of font info for 130 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  90i,9n,134p,694b,5050s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on _main.pdf (14 pages).
+Output written on _main.pdf (17 pages).
