@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999998 (TeX Live 2026) (preloaded format=xelatex 2026.4.13)  13 APR 2026 03:02
+This is XeTeX, Version 3.141592653-2.6-0.999998 (TeX Live 2026) (preloaded format=xelatex 2026.4.13)  13 APR 2026 03:10
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1334,8 +1334,8 @@ LaTeX Font Warning: Font shape `U/rsfs/m/n' in size <10.53937> not available
 \openout4 = `_main.toc'.
 
 LaTeX Font Info:    Font shape `TU/STSong(0)/b/n' will be
-(Font)              scaled to size 8.78397pt on input line 115.
-[2] [3]
+(Font)              scaled to size 8.78397pt on input line 119.
+[2] [3] [4] [5] [6] [7] [8] [9]
 
 Package fontspec Info: 
 (fontspec)             Script 'CJK' not explicitly supported within font
@@ -1378,11 +1378,14 @@ Package fontspec Info:
 (fontspec)             - 'normal' (m/n) with NFSS spec.:
 (fontspec)             <->s*[0.9707181870057879]"STFangsong/OT:script=hani;language=dflt;"
 
-[4]
+[10]
+LaTeX Font Info:    Font shape `TU/STFangsong(0)/m/n' will be
+(Font)              scaled to size 10.23074pt on input line 457.
+[11] [12]
 
-LaTeX Warning: Empty bibliography on input line 219.
+LaTeX Warning: Empty bibliography on input line 547.
 
-[5] (./_main.aux)
+[13] (./_main.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2022/07/14>
@@ -1396,12 +1399,12 @@ Package logreq Info: Writing requests to '_main.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 27782 strings out of 470015
- 555325 string characters out of 5474702
- 1636297 words of memory out of 5000000
- 56179 multiletter control sequences out of 15000+600000
- 636939 words of font info for 118 fonts, out of 8000000 for 9000
+ 27894 strings out of 470015
+ 561195 string characters out of 5474702
+ 1644452 words of memory out of 5000000
+ 56274 multiletter control sequences out of 15000+600000
+ 637027 words of font info for 129 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 90i,6n,134p,694b,5050s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 90i,9n,134p,694b,5050s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on _main.pdf (5 pages).
+Output written on _main.pdf (13 pages).
