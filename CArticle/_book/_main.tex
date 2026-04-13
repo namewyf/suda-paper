@@ -488,6 +488,29 @@ LOD方法的完整计算流程可分为离线阶段和在线阶段。离线阶�
 
 初始网格为\((0,1)^2\)上由两个直角三角形组成的标准剖分。通过\texttt{refineMesh}函数执行红化加密：将每个三角形单元的中点两两相连，分割为四个全等子三角形。加密过程中同时构造粗-细网格间的延拓与限制算子。
 
+对应主程序中的网格初始化与双层加密实现如下：
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\% initial triangulation}
+\VariableTok{p} \OperatorTok{=}\NormalTok{ [}\FloatTok{0} \FloatTok{0}\OperatorTok{;} \FloatTok{1} \FloatTok{0}\OperatorTok{;} \FloatTok{1} \FloatTok{1}\OperatorTok{;} \FloatTok{0} \FloatTok{1}\NormalTok{]}\OperatorTok{;}
+\VariableTok{t} \OperatorTok{=}\NormalTok{ [}\FloatTok{1} \FloatTok{2} \FloatTok{4}\OperatorTok{;} \FloatTok{2} \FloatTok{3} \FloatTok{4}\NormalTok{]}\OperatorTok{;}
+\VariableTok{T0} \OperatorTok{=} \VariableTok{struct}\NormalTok{(}\SpecialStringTok{\textquotesingle{}t\textquotesingle{}}\OperatorTok{,}\VariableTok{t}\OperatorTok{,}\SpecialStringTok{\textquotesingle{}p\textquotesingle{}}\OperatorTok{,}\VariableTok{p}\OperatorTok{,}\SpecialStringTok{\textquotesingle{}Dnodes\textquotesingle{}}\OperatorTok{,}\NormalTok{[}\FloatTok{1}\OperatorTok{;}\FloatTok{2}\OperatorTok{;}\FloatTok{3}\OperatorTok{;}\FloatTok{4}\NormalTok{])}\OperatorTok{;}
+
+\CommentTok{\% LOD parameters}
+\VariableTok{d} \OperatorTok{=} \FloatTok{2}\OperatorTok{;}
+\VariableTok{Hlevel} \OperatorTok{=} \FloatTok{2}\OperatorTok{;}
+\VariableTok{hlevel} \OperatorTok{=} \FloatTok{8}\OperatorTok{;}
+\VariableTok{ell} \OperatorTok{=} \FloatTok{1}\OperatorTok{;}
+
+\CommentTok{\% coarse and fine mesh}
+\NormalTok{[}\VariableTok{TH}\NormalTok{] }\OperatorTok{=} \VariableTok{refineMesh}\NormalTok{(}\VariableTok{T0}\OperatorTok{,}\VariableTok{Hlevel}\NormalTok{)}\OperatorTok{;}
+\NormalTok{[}\VariableTok{Th}\OperatorTok{,}\VariableTok{P1}\OperatorTok{,}\VariableTok{R1}\OperatorTok{,}\VariableTok{P0}\OperatorTok{,}\VariableTok{P1dg}\NormalTok{] }\OperatorTok{=} \VariableTok{refineMesh}\NormalTok{(}\VariableTok{TH}\OperatorTok{,}\VariableTok{hlevel}\OperatorTok{{-}}\VariableTok{Hlevel}\NormalTok{)}\OperatorTok{;}
+\VariableTok{NH} \OperatorTok{=} \VariableTok{size}\NormalTok{(}\VariableTok{TH}\NormalTok{.}\VariableTok{p}\OperatorTok{,}\FloatTok{1}\NormalTok{)}\OperatorTok{;}   \VariableTok{NTH} \OperatorTok{=} \VariableTok{size}\NormalTok{(}\VariableTok{TH}\NormalTok{.}\VariableTok{t}\OperatorTok{,}\FloatTok{1}\NormalTok{)}\OperatorTok{;}
+\VariableTok{Nh} \OperatorTok{=} \VariableTok{size}\NormalTok{(}\VariableTok{Th}\NormalTok{.}\VariableTok{p}\OperatorTok{,}\FloatTok{1}\NormalTok{)}\OperatorTok{;}   \VariableTok{NTh} \OperatorTok{=} \VariableTok{size}\NormalTok{(}\VariableTok{Th}\NormalTok{.}\VariableTok{t}\OperatorTok{,}\FloatTok{1}\NormalTok{)}\OperatorTok{;}
+\end{Highlighting}
+\end{Shaded}
+
 \subsubsection{拟插值算子的矩阵表示}\label{ux62dfux63d2ux503cux7b97ux5b50ux7684ux77e9ux9635ux8868ux793a}
 
 拟插值算子\(\mathcal{I}_H = E_H \circ \Pi_H^{\mathrm{dg}}\)的矩阵表示\texttt{IH}通过以下步骤构造：
@@ -505,17 +528,42 @@ LOD方法的完整计算流程可分为离线阶段和在线阶段。离线阶�
   合成：\texttt{IH\ =\ EH\ *\ PiHdg}。
 \end{enumerate}
 
+对应代码片段如下：
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\VariableTok{Nhdg} \OperatorTok{=} \VariableTok{numel}\NormalTok{(}\VariableTok{Th}\NormalTok{.}\VariableTok{t}\NormalTok{)}\OperatorTok{;}
+\VariableTok{NHdg} \OperatorTok{=} \VariableTok{numel}\NormalTok{(}\VariableTok{TH}\NormalTok{.}\VariableTok{t}\NormalTok{)}\OperatorTok{;}
+\VariableTok{dgHidx} \OperatorTok{=} \VariableTok{reshape}\NormalTok{(}\FloatTok{1}\OperatorTok{:}\VariableTok{NHdg}\OperatorTok{,}\VariableTok{d}\OperatorTok{+}\FloatTok{1}\OperatorTok{,}\NormalTok{[])}\OperatorTok{.\textquotesingle{};}
+\VariableTok{dghidx} \OperatorTok{=} \VariableTok{reshape}\NormalTok{((}\FloatTok{1}\OperatorTok{:}\VariableTok{Nhdg}\NormalTok{)}\OperatorTok{,}\VariableTok{d}\OperatorTok{+}\FloatTok{1}\OperatorTok{,}\NormalTok{[])}\OperatorTok{\textquotesingle{};}
+\VariableTok{nngH} \OperatorTok{=} \VariableTok{accumarray}\NormalTok{(}\VariableTok{TH}\NormalTok{.}\VariableTok{t}\NormalTok{(}\OperatorTok{:}\NormalTok{)}\OperatorTok{,}\FloatTok{1}\OperatorTok{,}\NormalTok{[}\VariableTok{NH}\OperatorTok{,}\FloatTok{1}\NormalTok{])}\OperatorTok{;} \VariableTok{nngH}\NormalTok{(}\VariableTok{TH}\NormalTok{.}\VariableTok{Dnodes}\NormalTok{) }\OperatorTok{=} \FloatTok{0}\OperatorTok{;}
+\VariableTok{nngh} \OperatorTok{=} \VariableTok{accumarray}\NormalTok{(}\VariableTok{Th}\NormalTok{.}\VariableTok{t}\NormalTok{(}\OperatorTok{:}\NormalTok{)}\OperatorTok{,}\FloatTok{1}\OperatorTok{,}\NormalTok{[}\VariableTok{Nh}\OperatorTok{,}\FloatTok{1}\NormalTok{])}\OperatorTok{;} \VariableTok{nngh}\NormalTok{(}\VariableTok{Th}\NormalTok{.}\VariableTok{Dnodes}\NormalTok{) }\OperatorTok{=} \FloatTok{0}\OperatorTok{;}
+\VariableTok{cg2dgh} \OperatorTok{=} \VariableTok{sparse}\NormalTok{(}\FloatTok{1}\OperatorTok{:}\VariableTok{Nhdg}\OperatorTok{,}\VariableTok{reshape}\NormalTok{(}\VariableTok{Th}\NormalTok{.}\VariableTok{t}\OperatorTok{.\textquotesingle{},}\FloatTok{1}\OperatorTok{,}\NormalTok{[])}\OperatorTok{,}\FloatTok{1}\OperatorTok{,}\VariableTok{Nhdg}\OperatorTok{,}\VariableTok{Nh}\NormalTok{)}\OperatorTok{;}
+\VariableTok{Mhdg} \OperatorTok{=} \VariableTok{kron}\NormalTok{(}\VariableTok{spdiags}\NormalTok{(}\VariableTok{computeArea}\NormalTok{(}\VariableTok{Th}\NormalTok{)}\OperatorTok{,}\FloatTok{0}\OperatorTok{,}\VariableTok{NTh}\OperatorTok{,}\VariableTok{NTh}\NormalTok{)}\OperatorTok{,}\NormalTok{[}\FloatTok{2} \FloatTok{1} \FloatTok{1}\OperatorTok{;}\FloatTok{1} \FloatTok{2} \FloatTok{1}\OperatorTok{;}\FloatTok{1} \FloatTok{1} \FloatTok{2}\NormalTok{]}\OperatorTok{./}\FloatTok{12}\NormalTok{)}\OperatorTok{;}
+\VariableTok{B} \OperatorTok{=} \VariableTok{kron}\NormalTok{(}\VariableTok{spdiags}\NormalTok{(}\FloatTok{1}\OperatorTok{./}\VariableTok{computeArea}\NormalTok{(}\VariableTok{TH}\NormalTok{)}\OperatorTok{,}\FloatTok{0}\OperatorTok{,}\VariableTok{NTH}\OperatorTok{,}\VariableTok{NTH}\NormalTok{)}\OperatorTok{,}\NormalTok{[}\FloatTok{9} \OperatorTok{{-}}\FloatTok{3} \OperatorTok{{-}}\FloatTok{3}\OperatorTok{;{-}}\FloatTok{3} \FloatTok{9} \OperatorTok{{-}}\FloatTok{3}\OperatorTok{;{-}}\FloatTok{3} \OperatorTok{{-}}\FloatTok{3} \FloatTok{9}\NormalTok{])}\OperatorTok{;}
+\VariableTok{PiHdg} \OperatorTok{=} \VariableTok{B}\OperatorTok{*}\NormalTok{((}\VariableTok{P1dg}\OperatorTok{.\textquotesingle{}*}\VariableTok{Mhdg}\NormalTok{)}\OperatorTok{*}\VariableTok{cg2dgh}\NormalTok{)}\OperatorTok{;}
+
+\VariableTok{cg2dgH} \OperatorTok{=} \VariableTok{sparse}\NormalTok{(}\FloatTok{1}\OperatorTok{:}\VariableTok{NHdg}\OperatorTok{,}\VariableTok{reshape}\NormalTok{(}\VariableTok{TH}\NormalTok{.}\VariableTok{t}\OperatorTok{.\textquotesingle{},}\FloatTok{1}\OperatorTok{,}\NormalTok{[])}\OperatorTok{,}\FloatTok{1}\OperatorTok{,}\VariableTok{NHdg}\OperatorTok{,}\VariableTok{NH}\NormalTok{)}\OperatorTok{;}
+\VariableTok{EH} \OperatorTok{=} \VariableTok{spdiags}\NormalTok{(}\FloatTok{1}\OperatorTok{./}\VariableTok{sum}\NormalTok{(}\VariableTok{cg2dgH}\OperatorTok{,}\FloatTok{1}\NormalTok{)}\OperatorTok{.\textquotesingle{},}\FloatTok{0}\OperatorTok{,}\VariableTok{NH}\OperatorTok{,}\VariableTok{NH}\NormalTok{)}\OperatorTok{*}\VariableTok{cg2dgH}\OperatorTok{.\textquotesingle{};}
+\VariableTok{IH} \OperatorTok{=} \VariableTok{EH}\OperatorTok{*}\VariableTok{PiHdg}\OperatorTok{;}
+\end{Highlighting}
+\end{Shaded}
+
 \subsubsection{局部补片定位算法}\label{ux5c40ux90e8ux8865ux7247ux5b9aux4f4dux7b97ux6cd5}
 
 补片矩阵\texttt{patch}通过邻接矩阵的幂次迭代计算：
 
-\begin{verbatim}
-patch = speye(NTH);
-for k = 1:ell
-    patch = Itt * patch;
-end
-patch = spones(patch) + speye(NTH);
-\end{verbatim}
+\begin{Shaded}
+\begin{Highlighting}[]
+\VariableTok{Ivt} \OperatorTok{=} \VariableTok{sparse}\NormalTok{(}\VariableTok{TH}\NormalTok{.}\VariableTok{t}\OperatorTok{,}\VariableTok{repmat}\NormalTok{((}\FloatTok{1}\OperatorTok{:}\VariableTok{NTH}\NormalTok{)}\OperatorTok{.\textquotesingle{},}\FloatTok{1}\OperatorTok{,}\VariableTok{d}\OperatorTok{+}\FloatTok{1}\NormalTok{)}\OperatorTok{,}\FloatTok{1}\OperatorTok{,}\VariableTok{NH}\OperatorTok{,}\VariableTok{NTH}\NormalTok{)}\OperatorTok{;}
+\VariableTok{Itt} \OperatorTok{=} \VariableTok{spones}\NormalTok{(}\VariableTok{Ivt}\OperatorTok{.\textquotesingle{}*}\VariableTok{Ivt}\NormalTok{)}\OperatorTok{;}
+\VariableTok{patch} \OperatorTok{=} \VariableTok{speye}\NormalTok{(}\VariableTok{NTH}\NormalTok{)}\OperatorTok{;}
+\KeywordTok{for} \VariableTok{k} \OperatorTok{=} \FloatTok{1}\OperatorTok{:}\VariableTok{ell}
+    \VariableTok{patch} \OperatorTok{=} \VariableTok{Itt} \OperatorTok{*} \VariableTok{patch}\OperatorTok{;}
+\KeywordTok{end}
+\VariableTok{patch} \OperatorTok{=} \VariableTok{spones}\NormalTok{(}\VariableTok{patch}\NormalTok{) }\OperatorTok{+} \VariableTok{speye}\NormalTok{(}\VariableTok{NTH}\NormalTok{)}\OperatorTok{;}
+\end{Highlighting}
+\end{Shaded}
 
 \texttt{patch(:,k)}中的非零项标识了第\(k\)单元\(\ell\)-补片包含的所有粗单元。
 
@@ -539,11 +587,35 @@ S_{\mathrm{ph}} & \mathrm{IHp}^T \\
 
 程序通过Schur补消去\(\phi_i\)：
 
-\begin{verbatim}
-X = Sph \ [IHp' rhsp];
-mu = (IHp * X(:,1:m)) \ (IHp * X(:,m+1:end));
-CT{k}(dofph,:) = X(:,m+1:end) - X(:,1:m) * mu;
-\end{verbatim}
+\begin{Shaded}
+\begin{Highlighting}[]
+\VariableTok{CT} \OperatorTok{=} \VariableTok{cell}\NormalTok{(}\FloatTok{1}\OperatorTok{,}\VariableTok{NTH}\NormalTok{)}\OperatorTok{;}
+\KeywordTok{for} \VariableTok{k} \OperatorTok{=} \FloatTok{1}\OperatorTok{:}\VariableTok{NTH}
+    \VariableTok{tpH} \OperatorTok{=} \VariableTok{logical}\NormalTok{(}\VariableTok{patch}\NormalTok{(}\OperatorTok{:,}\VariableTok{k}\NormalTok{))}\OperatorTok{;}
+    \VariableTok{dofpH} \OperatorTok{=} \VariableTok{find}\NormalTok{(}\VariableTok{accumarray}\NormalTok{(}\VariableTok{reshape}\NormalTok{(}\VariableTok{TH}\NormalTok{.}\VariableTok{t}\NormalTok{(}\VariableTok{tpH}\OperatorTok{,:}\NormalTok{)}\OperatorTok{,}\NormalTok{[]}\OperatorTok{,}\FloatTok{1}\NormalTok{)}\OperatorTok{,}\FloatTok{1}\OperatorTok{,}\NormalTok{[}\VariableTok{NH} \FloatTok{1}\NormalTok{]))}\OperatorTok{;}
+    \VariableTok{dofpH} \OperatorTok{=} \VariableTok{dofpH}\NormalTok{(}\VariableTok{nngH}\NormalTok{(}\VariableTok{dofpH}\NormalTok{)}\OperatorTok{\textgreater{}}\FloatTok{0}\NormalTok{)}\OperatorTok{;}
+
+    \VariableTok{tph} \OperatorTok{=} \VariableTok{logical}\NormalTok{(}\VariableTok{P0}\OperatorTok{*}\VariableTok{patch}\NormalTok{(}\OperatorTok{:,}\VariableTok{k}\NormalTok{))}\OperatorTok{;}
+    \VariableTok{nngph} \OperatorTok{=} \VariableTok{accumarray}\NormalTok{(}\VariableTok{reshape}\NormalTok{(}\VariableTok{Th}\NormalTok{.}\VariableTok{t}\NormalTok{(}\VariableTok{tph}\OperatorTok{,:}\NormalTok{)}\OperatorTok{,}\NormalTok{[]}\OperatorTok{,}\FloatTok{1}\NormalTok{)}\OperatorTok{,}\FloatTok{1}\OperatorTok{,}\NormalTok{[}\VariableTok{Nh} \FloatTok{1}\NormalTok{])}\OperatorTok{;}
+    \VariableTok{dofph} \OperatorTok{=} \VariableTok{find}\NormalTok{(}\VariableTok{nngph}\NormalTok{)}\OperatorTok{;}
+    \VariableTok{dofph} \OperatorTok{=} \VariableTok{dofph}\NormalTok{(}\VariableTok{nngph}\NormalTok{(}\VariableTok{dofph}\NormalTok{)}\OperatorTok{==}\VariableTok{nngh}\NormalTok{(}\VariableTok{dofph}\NormalTok{))}\OperatorTok{;}
+
+    \VariableTok{dofphdg} \OperatorTok{=} \VariableTok{reshape}\NormalTok{(}\VariableTok{dghidx}\NormalTok{(}\VariableTok{tph}\OperatorTok{,:}\NormalTok{)}\OperatorTok{.\textquotesingle{},}\NormalTok{[]}\OperatorTok{,}\FloatTok{1}\NormalTok{)}\OperatorTok{;}
+    \VariableTok{cg2dghk} \OperatorTok{=} \VariableTok{cg2dgh}\NormalTok{(}\VariableTok{dofphdg}\OperatorTok{,}\VariableTok{dofph}\NormalTok{)}\OperatorTok{;}
+    \VariableTok{Sph} \OperatorTok{=}\NormalTok{ (}\VariableTok{cg2dghk}\OperatorTok{.\textquotesingle{}*}\VariableTok{Shdg}\NormalTok{(}\VariableTok{dofphdg}\OperatorTok{,}\VariableTok{dofphdg}\NormalTok{))}\OperatorTok{*}\VariableTok{cg2dghk}\OperatorTok{;}
+    \VariableTok{tTh} \OperatorTok{=} \VariableTok{logical}\NormalTok{(}\VariableTok{P0}\OperatorTok{*}\VariableTok{patch}\NormalTok{(}\OperatorTok{:,}\VariableTok{k}\NormalTok{)}\OperatorTok{\textgreater{}}\FloatTok{1}\NormalTok{)}\OperatorTok{;}
+    \VariableTok{dofThdg} \OperatorTok{=} \VariableTok{reshape}\NormalTok{(}\VariableTok{dghidx}\NormalTok{(}\VariableTok{tTh}\OperatorTok{,:}\NormalTok{)}\OperatorTok{.\textquotesingle{},}\NormalTok{[]}\OperatorTok{,}\FloatTok{1}\NormalTok{)}\OperatorTok{;}
+    \VariableTok{cg2dghT} \OperatorTok{=} \VariableTok{cg2dgh}\NormalTok{(}\VariableTok{dofThdg}\OperatorTok{,}\VariableTok{dofph}\NormalTok{)}\OperatorTok{;}
+    \VariableTok{rhsp} \OperatorTok{=}\NormalTok{ (}\VariableTok{cg2dghT}\OperatorTok{.\textquotesingle{}*}\VariableTok{Shdg}\NormalTok{(}\VariableTok{dofThdg}\OperatorTok{,}\VariableTok{dofThdg}\NormalTok{))}\OperatorTok{*}\VariableTok{P1dg}\NormalTok{(}\VariableTok{dofThdg}\OperatorTok{,}\VariableTok{dgHidx}\NormalTok{(}\VariableTok{k}\OperatorTok{,:}\NormalTok{))}\OperatorTok{;}
+    \VariableTok{IHp} \OperatorTok{=} \VariableTok{IH}\NormalTok{(}\VariableTok{dofpH}\OperatorTok{,}\VariableTok{dofph}\NormalTok{)}\OperatorTok{;}
+
+    \VariableTok{X} \OperatorTok{=} \VariableTok{Sph}\OperatorTok{\textbackslash{}}\NormalTok{[}\VariableTok{IHp}\OperatorTok{.\textquotesingle{}} \VariableTok{rhsp}\NormalTok{]}\OperatorTok{;}
+    \VariableTok{mu} \OperatorTok{=}\NormalTok{ (}\VariableTok{IHp}\OperatorTok{*}\VariableTok{X}\NormalTok{(}\OperatorTok{:,}\FloatTok{1}\OperatorTok{:}\VariableTok{length}\NormalTok{(}\VariableTok{dofpH}\NormalTok{)))}\OperatorTok{\textbackslash{}}\NormalTok{(}\VariableTok{IHp}\OperatorTok{*}\VariableTok{X}\NormalTok{(}\OperatorTok{:,}\VariableTok{length}\NormalTok{(}\VariableTok{dofpH}\NormalTok{)}\OperatorTok{+}\NormalTok{(}\FloatTok{1}\OperatorTok{:}\VariableTok{d}\OperatorTok{+}\FloatTok{1}\NormalTok{)))}\OperatorTok{;}
+    \VariableTok{CT}\NormalTok{\{}\VariableTok{k}\NormalTok{\} }\OperatorTok{=} \VariableTok{sparse}\NormalTok{(}\VariableTok{Nh}\OperatorTok{,}\VariableTok{d}\OperatorTok{+}\FloatTok{1}\NormalTok{)}\OperatorTok{;}
+    \VariableTok{CT}\NormalTok{\{}\VariableTok{k}\NormalTok{\}(}\VariableTok{dofph}\OperatorTok{,:}\NormalTok{) }\OperatorTok{=} \VariableTok{X}\NormalTok{(}\OperatorTok{:,}\VariableTok{length}\NormalTok{(}\VariableTok{dofpH}\NormalTok{)}\OperatorTok{+}\NormalTok{(}\FloatTok{1}\OperatorTok{:}\VariableTok{d}\OperatorTok{+}\FloatTok{1}\NormalTok{)) }\OperatorTok{{-}} \VariableTok{X}\NormalTok{(}\OperatorTok{:,}\FloatTok{1}\OperatorTok{:}\VariableTok{length}\NormalTok{(}\VariableTok{dofpH}\NormalTok{))}\OperatorTok{*}\VariableTok{mu}\OperatorTok{;}
+\KeywordTok{end}
+\end{Highlighting}
+\end{Shaded}
 
 其中\(m\)为补片内约束条件数量（粗网格内部节点数），远小于细网格自由度数，使Schur补矩阵规模极小。
 
@@ -551,11 +623,33 @@ CT{k}(dofph,:) = X(:,m+1:end) - X(:,1:m) * mu;
 
 将所有单元校正子叠加得到全局校正矩阵\texttt{C\_ell\ =\ cell2mat(CT)\ *\ cg2dgH}，多尺度基函数矩阵为\texttt{G\ =\ P1\ -\ C\_ell}。粗网格LOD刚度矩阵通过三重矩阵乘积组装：
 
-\begin{verbatim}
-SHLOD0 = ((G0' * (cg2dgh' * Shdg)) * cg2dgh) * G0;
-\end{verbatim}
+\begin{Shaded}
+\begin{Highlighting}[]
+\VariableTok{C\_ell} \OperatorTok{=} \VariableTok{cell2mat}\NormalTok{(}\VariableTok{CT}\NormalTok{)}\OperatorTok{*}\VariableTok{cg2dgH}\OperatorTok{;}
+\VariableTok{G} \OperatorTok{=} \VariableTok{P1} \OperatorTok{{-}} \VariableTok{C\_ell}\OperatorTok{;}
+\VariableTok{dofH} \OperatorTok{=} \VariableTok{true}\NormalTok{(}\VariableTok{NH}\OperatorTok{,}\FloatTok{1}\NormalTok{)}\OperatorTok{;}
+\VariableTok{dofH}\NormalTok{(}\VariableTok{TH}\NormalTok{.}\VariableTok{Dnodes}\NormalTok{) }\OperatorTok{=} \FloatTok{0}\OperatorTok{;}
+\VariableTok{G0} \OperatorTok{=} \VariableTok{G}\NormalTok{(}\OperatorTok{:,}\VariableTok{dofH}\NormalTok{)}\OperatorTok{;}
+\VariableTok{SHLOD0} \OperatorTok{=}\NormalTok{ ((}\VariableTok{G0}\OperatorTok{\textquotesingle{}} \OperatorTok{*}\NormalTok{ (}\VariableTok{cg2dgh}\OperatorTok{\textquotesingle{}} \OperatorTok{*} \VariableTok{Shdg}\NormalTok{)) }\OperatorTok{*} \VariableTok{cg2dgh}\NormalTok{) }\OperatorTok{*} \VariableTok{G0}\OperatorTok{;}
+\VariableTok{rhs} \OperatorTok{=} \VariableTok{G0}\OperatorTok{\textquotesingle{}*}\NormalTok{(}\VariableTok{cg2dgh}\OperatorTok{\textquotesingle{}*}\NormalTok{(}\VariableTok{Mhdg}\OperatorTok{*}\NormalTok{(}\VariableTok{cg2dgh}\OperatorTok{*}\NormalTok{(}\VariableTok{P1}\OperatorTok{*}\VariableTok{f}\NormalTok{(}\VariableTok{TH}\NormalTok{.}\VariableTok{p}\NormalTok{)))))}\OperatorTok{;}
+\VariableTok{uH} \OperatorTok{=} \VariableTok{zeros}\NormalTok{(}\VariableTok{NH}\OperatorTok{,}\FloatTok{1}\NormalTok{)}\OperatorTok{;}
+\VariableTok{uH}\NormalTok{(}\VariableTok{dofH}\NormalTok{) }\OperatorTok{=} \VariableTok{SHLOD0}\OperatorTok{\textbackslash{}}\VariableTok{rhs}\OperatorTok{;}
+\VariableTok{uHms} \OperatorTok{=} \VariableTok{G}\OperatorTok{*}\VariableTok{uH}\OperatorTok{;}
+\end{Highlighting}
+\end{Shaded}
 
 粗网格系统求解后，通过\texttt{uHms\ =\ G\ *\ uH}重构细尺度信息。
+
+为量化方法精度，程序进一步输出能量模与\(L^2\)模误差：
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\VariableTok{fprintf}\NormalTok{(}\SpecialStringTok{\textquotesingle{}LOD{-}Error (in energy norm): \%7.5e\textbackslash{}n\textquotesingle{}}\OperatorTok{,}\VariableTok{sqrt}\NormalTok{((}\VariableTok{uh}\OperatorTok{{-}}\VariableTok{uHms}\NormalTok{)}\OperatorTok{.\textquotesingle{}*}\NormalTok{(}\VariableTok{Sh}\OperatorTok{*}\NormalTok{(}\VariableTok{uh}\OperatorTok{{-}}\VariableTok{uHms}\NormalTok{))))}\OperatorTok{;}
+\VariableTok{fprintf}\NormalTok{(}\SpecialStringTok{\textquotesingle{}LOD{-}Error (in L2 norm): \%7.5e\textbackslash{}n\textquotesingle{}}\OperatorTok{,}\VariableTok{sqrt}\NormalTok{((}\VariableTok{uh}\OperatorTok{{-}}\VariableTok{uHms}\NormalTok{)}\OperatorTok{.\textquotesingle{}*}\NormalTok{(}\VariableTok{Mh}\OperatorTok{*}\NormalTok{(}\VariableTok{uh}\OperatorTok{{-}}\VariableTok{uHms}\NormalTok{))))}\OperatorTok{;}
+\VariableTok{fprintf}\NormalTok{(}\SpecialStringTok{\textquotesingle{}Error of FE{-}part of LOD (in L2 norm): \%7.5e\textbackslash{}n\textquotesingle{}}\OperatorTok{,} \OperatorTok{...}
+    \VariableTok{sqrt}\NormalTok{((}\VariableTok{uh}\OperatorTok{{-}}\VariableTok{P1}\OperatorTok{*}\VariableTok{uH}\NormalTok{)}\OperatorTok{.\textquotesingle{}*}\NormalTok{(}\VariableTok{Mh}\OperatorTok{*}\NormalTok{(}\VariableTok{uh}\OperatorTok{{-}}\VariableTok{P1}\OperatorTok{*}\VariableTok{uH}\NormalTok{))))}\OperatorTok{;}
+\end{Highlighting}
+\end{Shaded}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
@@ -642,7 +736,394 @@ LOD方法的理论框架具有良好的可扩展性。在应用层面，方法�
 
 \section{附录：主要源程序清单}\label{appendix-code}
 
-（略，详见随文提交的code.md文件）
+下列代码清单与主程序\texttt{basicLOD2d.m}保持一致，并通过\texttt{code.md}在论文中完整给出。
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%}
+\CommentTok{\%\% Example code for Localized Orthogonal Decomposition method in 2d}
+\CommentTok{\%  Supplementry material of the book}
+\CommentTok{\%\% An Introduction to the Localized Orthogonal Decomposition method}
+\CommentTok{\%  by }
+\CommentTok{\%\% A. Malqvist (Chalmers University of Technology and University of Gothenburg)}
+\CommentTok{\%  and }
+\CommentTok{\%\% D. Peterseim (University of Augsburg)}
+\CommentTok{\%}
+\CommentTok{\% The code is explained in detail in Chapter 7 of the book. It produces an}
+\CommentTok{\% LOD approximation of a prototypical linear elliptic diffusion problem as}
+\CommentTok{\% used throughout the book. The script can be run in Matlab or Octave. }
+\CommentTok{\% All required subroutines are contained in this file. The user may adapt }
+\CommentTok{\% the parameters. }
+\CommentTok{\%}
+\CommentTok{\% Copyright (C) 2020 Daniel Peterseim {-} All Rights Reserved}
+\CommentTok{\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%}
+
+\CommentTok{\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%}
+\CommentTok{\%\% Main script}
+\CommentTok{\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%}
+
+\CommentTok{\%\% Clear work space}
+\VariableTok{clear} \VariableTok{all}\OperatorTok{;}
+
+\CommentTok{\%\% Model problem}
+\CommentTok{\% physical dimension}
+\VariableTok{d} \OperatorTok{=} \FloatTok{2}\OperatorTok{;} 
+\CommentTok{\% seed the random number generator (if possible)}
+\KeywordTok{if} \VariableTok{exist}\NormalTok{(}\SpecialStringTok{\textquotesingle{}rng\textquotesingle{}}\NormalTok{) }\VariableTok{rng}\NormalTok{(}\FloatTok{27}\NormalTok{)}\OperatorTok{;} \KeywordTok{end} 
+\CommentTok{\% bounds of diffusion coefficient A}
+\VariableTok{alpha} \OperatorTok{=} \FloatTok{0.01}\OperatorTok{;} 
+\VariableTok{beta} \OperatorTok{=} \FloatTok{1}\OperatorTok{;} 
+\CommentTok{\% number of cells per coordinate direction}
+\VariableTok{Neps} \OperatorTok{=} \FloatTok{2}\OperatorTok{\^{}}\FloatTok{6}\OperatorTok{;}
+\CommentTok{\% diffusion coefficient on Cartesian mesh}
+\VariableTok{Aeps} \OperatorTok{=} \VariableTok{alpha}\OperatorTok{+}\NormalTok{(}\VariableTok{beta}\OperatorTok{{-}}\VariableTok{alpha}\NormalTok{)}\OperatorTok{.*}\NormalTok{(}\VariableTok{randi}\NormalTok{(}\FloatTok{2}\OperatorTok{,}\VariableTok{Neps}\OperatorTok{,}\VariableTok{Neps}\NormalTok{)}\OperatorTok{{-}}\FloatTok{1}\NormalTok{)}\OperatorTok{;}
+\CommentTok{\% turn Aeps into function depending on (a list of) points in Omega}
+\VariableTok{A} \OperatorTok{=} \OperatorTok{@}\NormalTok{(}\VariableTok{x}\NormalTok{) }\VariableTok{Aeps}\NormalTok{((}\VariableTok{ceil}\NormalTok{(}\VariableTok{x}\NormalTok{(}\OperatorTok{:,}\FloatTok{1}\NormalTok{)}\OperatorTok{*}\VariableTok{Neps}\NormalTok{)}\OperatorTok{{-}}\FloatTok{1}\NormalTok{)}\OperatorTok{*}\VariableTok{Neps}\OperatorTok{+}\NormalTok{(}\VariableTok{ceil}\NormalTok{(}\VariableTok{x}\NormalTok{(}\OperatorTok{:,}\FloatTok{2}\NormalTok{)}\OperatorTok{*}\VariableTok{Neps}\NormalTok{)))}\OperatorTok{;}
+\CommentTok{\%A = @(x) 1;}
+\CommentTok{\% right{-}hand side}
+\VariableTok{f} \OperatorTok{=} \OperatorTok{@}\NormalTok{(}\VariableTok{x}\NormalTok{) }\VariableTok{ones}\NormalTok{(}\VariableTok{size}\NormalTok{(}\VariableTok{x}\OperatorTok{,}\FloatTok{1}\NormalTok{)}\OperatorTok{,}\FloatTok{1}\NormalTok{)}\OperatorTok{;}
+
+\CommentTok{\%\% Initial mesh}
+\CommentTok{\% list of coordinates of vertices}
+\VariableTok{p} \OperatorTok{=}\NormalTok{ [}\FloatTok{0} \FloatTok{0}\OperatorTok{;} \FloatTok{1} \FloatTok{0}\OperatorTok{;} \FloatTok{1} \FloatTok{1}\OperatorTok{;} \FloatTok{0} \FloatTok{1}\NormalTok{]}\OperatorTok{;}
+\CommentTok{\% triangles by references to vertex numbers}
+\VariableTok{t} \OperatorTok{=}\NormalTok{ [}\FloatTok{1} \FloatTok{2} \FloatTok{4}\OperatorTok{;} \FloatTok{2} \FloatTok{3} \FloatTok{4}\NormalTok{]}\OperatorTok{;}
+\CommentTok{\% initial triangulation of Omega as structure array}
+\VariableTok{T0} \OperatorTok{=} \VariableTok{struct}\NormalTok{(}\SpecialStringTok{\textquotesingle{}t\textquotesingle{}}\OperatorTok{,}\VariableTok{t}\OperatorTok{,}\SpecialStringTok{\textquotesingle{}p\textquotesingle{}}\OperatorTok{,}\VariableTok{p}\OperatorTok{,}\SpecialStringTok{\textquotesingle{}Dnodes\textquotesingle{}}\OperatorTok{,}\NormalTok{[}\FloatTok{1}\OperatorTok{;}\FloatTok{2}\OperatorTok{;}\FloatTok{3}\OperatorTok{;}\FloatTok{4}\NormalTok{])}\OperatorTok{;}
+
+\CommentTok{\%\% LOD parameters}
+\VariableTok{Hlevel} \OperatorTok{=}\FloatTok{2}\OperatorTok{;}
+\VariableTok{hlevel} \OperatorTok{=} \FloatTok{8}\OperatorTok{;}
+\VariableTok{ell} \OperatorTok{=} \FloatTok{1}\OperatorTok{;}
+
+\CommentTok{\%\% coarse mesh}
+\CommentTok{\% refine initial mesh Hlevel times}
+\NormalTok{[}\VariableTok{TH}\NormalTok{] }\OperatorTok{=} \VariableTok{refineMesh}\NormalTok{(}\VariableTok{T0}\OperatorTok{,}\VariableTok{Hlevel}\NormalTok{)}\OperatorTok{;}
+\CommentTok{\% define numbers of vertices NH and elements NTH}
+\VariableTok{NH} \OperatorTok{=} \VariableTok{size}\NormalTok{(}\VariableTok{TH}\NormalTok{.}\VariableTok{p}\OperatorTok{,}\FloatTok{1}\NormalTok{)}\OperatorTok{;}
+\VariableTok{NTH} \OperatorTok{=} \VariableTok{size}\NormalTok{(}\VariableTok{TH}\NormalTok{.}\VariableTok{t}\OperatorTok{,}\FloatTok{1}\NormalTok{)}\OperatorTok{;}
+\CommentTok{\% define number of local vertices}
+\VariableTok{NHdg} \OperatorTok{=} \VariableTok{numel}\NormalTok{(}\VariableTok{TH}\NormalTok{.}\VariableTok{t}\NormalTok{)}\OperatorTok{;}
+\CommentTok{\% enumerate local vertices acoording to their appearence in TH.t}
+\VariableTok{dgHidx} \OperatorTok{=} \VariableTok{reshape}\NormalTok{(}\FloatTok{1}\OperatorTok{:}\VariableTok{NHdg}\OperatorTok{,}\VariableTok{d}\OperatorTok{+}\FloatTok{1}\OperatorTok{,}\NormalTok{[])}\OperatorTok{.\textquotesingle{};}
+\CommentTok{\% compute area of elements}
+\VariableTok{areaTH} \OperatorTok{=} \VariableTok{computeArea}\NormalTok{(}\VariableTok{TH}\NormalTok{)}\OperatorTok{;}
+\CommentTok{\% nngH is the number of neighbors for interior and 0 for boundary vertices}
+\VariableTok{nngH} \OperatorTok{=} \VariableTok{accumarray}\NormalTok{(}\VariableTok{TH}\NormalTok{.}\VariableTok{t}\NormalTok{(}\OperatorTok{:}\NormalTok{)}\OperatorTok{,}\FloatTok{1}\OperatorTok{,}\NormalTok{[}\VariableTok{NH}\OperatorTok{,}\FloatTok{1}\NormalTok{])}\OperatorTok{;}
+\VariableTok{nngH}\NormalTok{(}\VariableTok{TH}\NormalTok{.}\VariableTok{Dnodes}\NormalTok{) }\OperatorTok{=} \FloatTok{0}\OperatorTok{;}
+
+\CommentTok{\%\% fine mesh}
+\CommentTok{\% refine initial mesh hlevel{-}Hlevel times}
+\NormalTok{[}\VariableTok{Th}\OperatorTok{,}\VariableTok{P1}\OperatorTok{,}\VariableTok{R1}\OperatorTok{,}\VariableTok{P0}\OperatorTok{,}\VariableTok{P1dg}\NormalTok{] }\OperatorTok{=} \VariableTok{refineMesh}\NormalTok{(}\VariableTok{TH}\OperatorTok{,}\VariableTok{hlevel}\OperatorTok{{-}}\VariableTok{Hlevel}\NormalTok{)}\OperatorTok{;}
+\CommentTok{\% define numbers of vertices Nh and elements NTh}
+\VariableTok{Nh} \OperatorTok{=} \VariableTok{size}\NormalTok{(}\VariableTok{Th}\NormalTok{.}\VariableTok{p}\OperatorTok{,}\FloatTok{1}\NormalTok{)}\OperatorTok{;}
+\VariableTok{NTh} \OperatorTok{=} \VariableTok{size}\NormalTok{(}\VariableTok{Th}\NormalTok{.}\VariableTok{t}\OperatorTok{,}\FloatTok{1}\NormalTok{)}\OperatorTok{;}
+\CommentTok{\% define number of local vertices}
+\VariableTok{Nhdg} \OperatorTok{=} \VariableTok{numel}\NormalTok{(}\VariableTok{Th}\NormalTok{.}\VariableTok{t}\NormalTok{)}\OperatorTok{;}
+\CommentTok{\% enumerate local vertices acoording to their appearence in Th.t}
+\VariableTok{dghidx} \OperatorTok{=} \VariableTok{reshape}\NormalTok{((}\FloatTok{1}\OperatorTok{:}\VariableTok{Nhdg}\NormalTok{)}\OperatorTok{,}\VariableTok{d}\OperatorTok{+}\FloatTok{1}\OperatorTok{,}\NormalTok{[])}\OperatorTok{\textquotesingle{};}
+\CommentTok{\% nngh is the number of neighbors for interior and 0 for boundary vertices}
+\VariableTok{nngh} \OperatorTok{=} \VariableTok{accumarray}\NormalTok{(}\VariableTok{Th}\NormalTok{.}\VariableTok{t}\NormalTok{(}\OperatorTok{:}\NormalTok{)}\OperatorTok{,}\FloatTok{1}\OperatorTok{,}\NormalTok{[}\VariableTok{Nh}\OperatorTok{,}\FloatTok{1}\NormalTok{])}\OperatorTok{;}
+\VariableTok{nngh}\NormalTok{(}\VariableTok{Th}\NormalTok{.}\VariableTok{Dnodes}\NormalTok{) }\OperatorTok{=} \FloatTok{0}\OperatorTok{;}
+
+\CommentTok{\%\% quasi{-}interpolation}
+\CommentTok{\% embedding of continuous into discontinuous finite element functions}
+\VariableTok{cg2dgh} \OperatorTok{=} \VariableTok{sparse}\NormalTok{(}\FloatTok{1}\OperatorTok{:}\VariableTok{Nhdg}\OperatorTok{,}\VariableTok{reshape}\NormalTok{(}\VariableTok{Th}\NormalTok{.}\VariableTok{t}\OperatorTok{.\textquotesingle{},}\FloatTok{1}\OperatorTok{,}\NormalTok{[])}\OperatorTok{,}\FloatTok{1}\OperatorTok{,}\VariableTok{Nhdg}\OperatorTok{,}\VariableTok{Nh}\NormalTok{)}\OperatorTok{;}
+\CommentTok{\% mass matrix for finite discontinuous finite elements}
+\VariableTok{Mhdg} \OperatorTok{=} \VariableTok{kron}\NormalTok{(}\VariableTok{spdiags}\NormalTok{(}\VariableTok{computeArea}\NormalTok{(}\VariableTok{Th}\NormalTok{)}\OperatorTok{,}\FloatTok{0}\OperatorTok{,}\VariableTok{NTh}\OperatorTok{,}\VariableTok{NTh}\NormalTok{)}\OperatorTok{,}\NormalTok{[}\FloatTok{2} \FloatTok{1} \FloatTok{1}\OperatorTok{;}\FloatTok{1} \FloatTok{2} \FloatTok{1}\OperatorTok{;}\FloatTok{1} \FloatTok{1} \FloatTok{2}\NormalTok{]}\OperatorTok{./}\FloatTok{12}\NormalTok{)}\OperatorTok{;}
+\CommentTok{\% inverse of mass matrix for coarse discontinuous finite elements}
+\VariableTok{B} \OperatorTok{=} \VariableTok{kron}\NormalTok{(}\VariableTok{spdiags}\NormalTok{(}\FloatTok{1}\OperatorTok{./}\VariableTok{computeArea}\NormalTok{(}\VariableTok{TH}\NormalTok{)}\OperatorTok{,}\FloatTok{0}\OperatorTok{,}\VariableTok{NTH}\OperatorTok{,}\VariableTok{NTH}\NormalTok{)}\OperatorTok{,}\NormalTok{[}\FloatTok{9} \OperatorTok{{-}}\FloatTok{3} \OperatorTok{{-}}\FloatTok{3}\OperatorTok{;{-}}\FloatTok{3} \FloatTok{9} \OperatorTok{{-}}\FloatTok{3}\OperatorTok{;{-}}\FloatTok{3} \OperatorTok{{-}}\FloatTok{3} \FloatTok{9}\NormalTok{])}\OperatorTok{;}
+\CommentTok{\% compute L2 projection onto coarse discontinuous finite elements}
+\VariableTok{PiHdg} \OperatorTok{=} \VariableTok{B}\OperatorTok{*}\NormalTok{((}\VariableTok{P1dg}\OperatorTok{.\textquotesingle{}*}\VariableTok{Mhdg}\NormalTok{)}\OperatorTok{*}\VariableTok{cg2dgh}\NormalTok{)}\OperatorTok{;}
+\CommentTok{\% embedding of continuous into discontinuous finite element functions}
+\VariableTok{cg2dgH} \OperatorTok{=} \VariableTok{sparse}\NormalTok{(}\FloatTok{1}\OperatorTok{:}\VariableTok{NHdg}\OperatorTok{,}\VariableTok{reshape}\NormalTok{(}\VariableTok{TH}\NormalTok{.}\VariableTok{t}\OperatorTok{.\textquotesingle{},}\FloatTok{1}\OperatorTok{,}\NormalTok{[])}\OperatorTok{,}\FloatTok{1}\OperatorTok{,}\VariableTok{NHdg}\OperatorTok{,}\VariableTok{NH}\NormalTok{)}\OperatorTok{;}
+\VariableTok{EH} \OperatorTok{=} \VariableTok{spdiags}\NormalTok{(}\FloatTok{1}\OperatorTok{./}\VariableTok{sum}\NormalTok{(}\VariableTok{cg2dgH}\OperatorTok{,}\FloatTok{1}\NormalTok{)}\OperatorTok{.\textquotesingle{},}\FloatTok{0}\OperatorTok{,}\VariableTok{NH}\OperatorTok{,}\VariableTok{NH}\NormalTok{)}\OperatorTok{*}\VariableTok{cg2dgH}\OperatorTok{.\textquotesingle{};}
+\CommentTok{\% IH is the product of EH and PiHdg.}
+\VariableTok{IH} \OperatorTok{=} \VariableTok{EH}\OperatorTok{*}\VariableTok{PiHdg}\OperatorTok{;}
+\CommentTok{\%\% for test}
+\VariableTok{MHdg} \OperatorTok{=} \VariableTok{kron}\NormalTok{(}\VariableTok{spdiags}\NormalTok{(}\VariableTok{computeArea}\NormalTok{(}\VariableTok{TH}\NormalTok{)}\OperatorTok{,}\FloatTok{0}\OperatorTok{,}\VariableTok{NTH}\OperatorTok{,}\VariableTok{NTH}\NormalTok{)}\OperatorTok{,}\NormalTok{[}\FloatTok{2} \FloatTok{1} \FloatTok{1}\OperatorTok{;}\FloatTok{1} \FloatTok{2} \FloatTok{1}\OperatorTok{;}\FloatTok{1} \FloatTok{1} \FloatTok{2}\NormalTok{]}\OperatorTok{./}\FloatTok{12}\NormalTok{)}\OperatorTok{;}
+
+\CommentTok{\%\% element patches}
+\CommentTok{\% incidence matrix of coarse elements and vertices}
+\VariableTok{Ivt} \OperatorTok{=} \VariableTok{sparse}\NormalTok{(}\VariableTok{TH}\NormalTok{.}\VariableTok{t}\OperatorTok{,}\VariableTok{repmat}\NormalTok{((}\FloatTok{1}\OperatorTok{:}\VariableTok{NTH}\NormalTok{)}\OperatorTok{.\textquotesingle{},}\FloatTok{1}\OperatorTok{,}\VariableTok{d}\OperatorTok{+}\FloatTok{1}\NormalTok{)}\OperatorTok{,}\FloatTok{1}\OperatorTok{,}\VariableTok{NH}\OperatorTok{,}\VariableTok{NTH}\NormalTok{)}\OperatorTok{;}
+\CommentTok{\% incidence matrix of coarse elements}
+\VariableTok{Itt} \OperatorTok{=} \VariableTok{spones}\NormalTok{(}\VariableTok{Ivt}\OperatorTok{.\textquotesingle{}*}\VariableTok{Ivt}\NormalTok{)}\OperatorTok{;}
+\CommentTok{\% initialize patch matrix as identity}
+\VariableTok{patch} \OperatorTok{=} \VariableTok{speye}\NormalTok{(}\VariableTok{NTH}\NormalTok{)}\OperatorTok{;}
+\CommentTok{\% succesively apply Itt ell times}
+\KeywordTok{for} \VariableTok{k} \OperatorTok{=} \FloatTok{1}\OperatorTok{:}\VariableTok{ell}
+    \VariableTok{patch} \OperatorTok{=} \VariableTok{Itt}\OperatorTok{*}\VariableTok{patch}\OperatorTok{;}
+\KeywordTok{end}
+\CommentTok{\% set non{-}zero entries to 1 and diagonal entries to 2}
+\VariableTok{patch} \OperatorTok{=} \VariableTok{spones}\NormalTok{(}\VariableTok{patch}\NormalTok{)}\OperatorTok{+}\VariableTok{speye}\NormalTok{(}\VariableTok{NTH}\NormalTok{)}\OperatorTok{;}
+
+\CommentTok{\%\% global stiffness and mass matrix}
+\CommentTok{\% evaluate diffusion coefficient at midpoints of elements}
+\VariableTok{Ah} \OperatorTok{=} \VariableTok{A}\NormalTok{((}\VariableTok{Th}\NormalTok{.}\VariableTok{p}\NormalTok{(}\VariableTok{Th}\NormalTok{.}\VariableTok{t}\NormalTok{(}\OperatorTok{:,}\FloatTok{1}\NormalTok{)}\OperatorTok{,:}\NormalTok{)}\OperatorTok{+}\VariableTok{Th}\NormalTok{.}\VariableTok{p}\NormalTok{(}\VariableTok{Th}\NormalTok{.}\VariableTok{t}\NormalTok{(}\OperatorTok{:,}\FloatTok{2}\NormalTok{)}\OperatorTok{,:}\NormalTok{)}\OperatorTok{+}\VariableTok{Th}\NormalTok{.}\VariableTok{p}\NormalTok{(}\VariableTok{Th}\NormalTok{.}\VariableTok{t}\NormalTok{(}\OperatorTok{:,}\FloatTok{3}\NormalTok{)}\OperatorTok{,:}\NormalTok{))}\OperatorTok{./}\FloatTok{3}\NormalTok{)}\OperatorTok{;}
+\CommentTok{\% assemble stiffness matrix for discontinuous functions}
+\VariableTok{Shdg} \OperatorTok{=} \VariableTok{assembleStiffnessMatrixDG}\NormalTok{(}\VariableTok{Th}\OperatorTok{,}\VariableTok{Ah}\NormalTok{)}\OperatorTok{;}
+
+\CommentTok{\%\% element correctors}
+\CommentTok{\% initialize cell array for element correctors}
+\VariableTok{CT} \OperatorTok{=} \VariableTok{cell}\NormalTok{(}\FloatTok{1}\OperatorTok{,}\VariableTok{NTH}\NormalTok{)}\OperatorTok{;}
+\CommentTok{\% loop over coarse elements}
+\KeywordTok{for} \VariableTok{k}\OperatorTok{=}\FloatTok{1}\OperatorTok{:}\VariableTok{NTH}
+    \CommentTok{\% tpH(j) = true iff coarse element j is in ell{-}patch of element k }
+    \VariableTok{tpH} \OperatorTok{=} \VariableTok{logical}\NormalTok{(}\VariableTok{patch}\NormalTok{(}\OperatorTok{:,}\VariableTok{k}\NormalTok{))}\OperatorTok{;}
+    \CommentTok{\% indices of corase patch vertices}
+    \VariableTok{dofpH} \OperatorTok{=} \VariableTok{find}\NormalTok{(}\VariableTok{accumarray}\NormalTok{(}\VariableTok{reshape}\NormalTok{(}\VariableTok{TH}\NormalTok{.}\VariableTok{t}\NormalTok{(}\VariableTok{tpH}\OperatorTok{,:}\NormalTok{)}\OperatorTok{,}\NormalTok{[]}\OperatorTok{,}\FloatTok{1}\NormalTok{)}\OperatorTok{,}\FloatTok{1}\OperatorTok{,}\NormalTok{[}\VariableTok{NH} \FloatTok{1}\NormalTok{]))}\OperatorTok{;}
+    \CommentTok{\% remove (global) boundary vertices }
+    \VariableTok{dofpH} \OperatorTok{=} \VariableTok{dofpH}\NormalTok{(}\VariableTok{nngH}\NormalTok{(}\VariableTok{dofpH}\NormalTok{)}\OperatorTok{\textgreater{}}\FloatTok{0}\NormalTok{)}\OperatorTok{;} 
+    \CommentTok{\% tph(j) = true iff fine element j is in ell{-}patch of element k }
+    \VariableTok{tph} \OperatorTok{=} \VariableTok{logical}\NormalTok{(}\VariableTok{P0}\OperatorTok{*}\VariableTok{patch}\NormalTok{(}\OperatorTok{:,}\VariableTok{k}\NormalTok{))}\OperatorTok{;}
+    \CommentTok{\% nngph is the number of neighbors for fine patch vertices and 0 else}
+    \VariableTok{nngph} \OperatorTok{=} \VariableTok{accumarray}\NormalTok{(}\VariableTok{reshape}\NormalTok{(}\VariableTok{Th}\NormalTok{.}\VariableTok{t}\NormalTok{(}\VariableTok{tph}\OperatorTok{,:}\NormalTok{)}\OperatorTok{,}\NormalTok{[]}\OperatorTok{,}\FloatTok{1}\NormalTok{)}\OperatorTok{,}\FloatTok{1}\OperatorTok{,}\NormalTok{[}\VariableTok{Nh} \FloatTok{1}\NormalTok{])}\OperatorTok{;}
+    \CommentTok{\% non{-}zero entries of nngph identify fine patch vertices}
+    \VariableTok{dofph} \OperatorTok{=} \VariableTok{find}\NormalTok{(}\VariableTok{nngph}\NormalTok{)}\OperatorTok{;}
+    \CommentTok{\% remove boundary vertices by comparing number of neighbors }
+    \CommentTok{\% in the patch with number of global neighbors}
+    \VariableTok{dofph} \OperatorTok{=} \VariableTok{dofph}\NormalTok{(}\VariableTok{nngph}\NormalTok{(}\VariableTok{dofph}\NormalTok{)}\OperatorTok{==}\VariableTok{nngh}\NormalTok{(}\VariableTok{dofph}\NormalTok{))}\OperatorTok{;}
+    \CommentTok{\% restrict fine stiffness matrix to dof}
+    \VariableTok{dofphdg} \OperatorTok{=} \VariableTok{reshape}\NormalTok{(}\VariableTok{dghidx}\NormalTok{(}\VariableTok{tph}\OperatorTok{,:}\NormalTok{)}\OperatorTok{.\textquotesingle{},}\NormalTok{[]}\OperatorTok{,}\FloatTok{1}\NormalTok{)}\OperatorTok{;}
+    \VariableTok{cg2dghk} \OperatorTok{=} \VariableTok{cg2dgh}\NormalTok{(}\VariableTok{dofphdg}\OperatorTok{,}\VariableTok{dofph}\NormalTok{)}\OperatorTok{;}
+    \VariableTok{Sph} \OperatorTok{=}\NormalTok{ (}\VariableTok{cg2dghk}\OperatorTok{.\textquotesingle{}*}\VariableTok{Shdg}\NormalTok{(}\VariableTok{dofphdg}\OperatorTok{,}\VariableTok{dofphdg}\NormalTok{))}\OperatorTok{*}\VariableTok{cg2dghk}\OperatorTok{;}
+    \CommentTok{\% tTh(j) = true iff fine element j is in coarse element k}
+    \VariableTok{tTh} \OperatorTok{=} \VariableTok{logical}\NormalTok{(}\VariableTok{P0}\OperatorTok{*}\VariableTok{patch}\NormalTok{(}\OperatorTok{:,}\VariableTok{k}\NormalTok{)}\OperatorTok{\textgreater{}}\FloatTok{1}\NormalTok{)}\OperatorTok{;}
+    \CommentTok{\% assemble right{-}hand side}
+    \VariableTok{dofThdg} \OperatorTok{=} \VariableTok{reshape}\NormalTok{(}\VariableTok{dghidx}\NormalTok{(}\VariableTok{tTh}\OperatorTok{,:}\NormalTok{)}\OperatorTok{.\textquotesingle{},}\NormalTok{[]}\OperatorTok{,}\FloatTok{1}\NormalTok{)}\OperatorTok{;}
+    \VariableTok{cg2dghT} \OperatorTok{=} \VariableTok{cg2dgh}\NormalTok{(}\VariableTok{dofThdg}\OperatorTok{,}\VariableTok{dofph}\NormalTok{)}\OperatorTok{;}
+    \VariableTok{rhsp} \OperatorTok{=}\NormalTok{ (}\VariableTok{cg2dghT}\OperatorTok{.\textquotesingle{}*}\VariableTok{Shdg}\NormalTok{(}\VariableTok{dofThdg}\OperatorTok{,}\VariableTok{dofThdg}\NormalTok{))}\OperatorTok{*}\VariableTok{P1dg}\NormalTok{(}\VariableTok{dofThdg}\OperatorTok{,}\VariableTok{dgHidx}\NormalTok{(}\VariableTok{k}\OperatorTok{,:}\NormalTok{))}\OperatorTok{;}
+    \CommentTok{\% restrict quasi interpolation to patch}
+    \VariableTok{IHp} \OperatorTok{=} \VariableTok{IH}\NormalTok{(}\VariableTok{dofpH}\OperatorTok{,}\VariableTok{dofph}\NormalTok{)}\OperatorTok{;}
+    \CommentTok{\% solve corrector problem}
+    \VariableTok{X} \OperatorTok{=} \VariableTok{Sph}\OperatorTok{\textbackslash{}}\NormalTok{[}\VariableTok{IHp}\OperatorTok{.\textquotesingle{}} \VariableTok{rhsp}\NormalTok{]}\OperatorTok{;}
+    \VariableTok{mu} \OperatorTok{=}\NormalTok{ (}\VariableTok{IHp}\OperatorTok{*}\VariableTok{X}\NormalTok{(}\OperatorTok{:,}\FloatTok{1}\OperatorTok{:}\VariableTok{length}\NormalTok{(}\VariableTok{dofpH}\NormalTok{)))}\OperatorTok{\textbackslash{}}\NormalTok{(}\VariableTok{IHp}\OperatorTok{*}\VariableTok{X}\NormalTok{(}\OperatorTok{:,}\VariableTok{length}\NormalTok{(}\VariableTok{dofpH}\NormalTok{)}\OperatorTok{+}\NormalTok{(}\FloatTok{1}\OperatorTok{:}\VariableTok{d}\OperatorTok{+}\FloatTok{1}\NormalTok{)))}\OperatorTok{;}
+     \VariableTok{CT}\NormalTok{\{}\VariableTok{k}\NormalTok{\} }\OperatorTok{=} \VariableTok{sparse}\NormalTok{(}\VariableTok{Nh}\OperatorTok{,}\VariableTok{d}\OperatorTok{+}\FloatTok{1}\NormalTok{)}\OperatorTok{;}
+     \VariableTok{CT}\NormalTok{\{}\VariableTok{k}\NormalTok{\}(}\VariableTok{dofph}\OperatorTok{,:}\NormalTok{) }\OperatorTok{=} \VariableTok{X}\NormalTok{(}\OperatorTok{:,}\VariableTok{length}\NormalTok{(}\VariableTok{dofpH}\NormalTok{)}\OperatorTok{+}\NormalTok{(}\FloatTok{1}\OperatorTok{:}\VariableTok{d}\OperatorTok{+}\FloatTok{1}\NormalTok{))}\OperatorTok{{-}}\VariableTok{X}\NormalTok{(}\OperatorTok{:,}\FloatTok{1}\OperatorTok{:}\VariableTok{length}\NormalTok{(}\VariableTok{dofpH}\NormalTok{))}\OperatorTok{*}\VariableTok{mu}\OperatorTok{;}
+     \CommentTok{\%\% for test}
+\CommentTok{\%      mH=length(dofpH);}
+\CommentTok{\%      mh=length(dofph);}
+\CommentTok{\%      MHdgT=MHdg(dofpH,dofpH);}
+\CommentTok{\%      X=[Sph (MHdgT*IHp).\textquotesingle{};}
+\CommentTok{\%         MHdgT*IHp  zeros(mH,mH)];}
+\CommentTok{\%       u=X\textbackslash{}[rhsp;zeros(mH,3)];}
+\CommentTok{\%  }
+\CommentTok{\% }
+\CommentTok{\%       X=[Sph {-}(MHdgT*IHp).\textquotesingle{};}
+\CommentTok{\%         MHdgT*IHp  zeros(mH,mH)];}
+\CommentTok{\%       Tran=cg2dgH(:,dofpH);}
+\CommentTok{\%    Tran=Tran\textquotesingle{};}
+\CommentTok{\%    dof4Ek=3*k{-}2:3*k;}
+\CommentTok{\%    rhs2=Tran*MHdg(:,dof4Ek);}
+\CommentTok{\%       rhs=[zeros(mh,3);rhs2];}
+\CommentTok{\%       u=X\textbackslash{}rhs;}
+\CommentTok{\%       CT\{k\}(dofph,:)=u(1:mh,:);}
+\CommentTok{\%      CTT\{k\} = sparse(Nh,d+1);}
+\CommentTok{\%      CTT\{k\}(dofph,:) = u(1:mh,:);}
+     
+\KeywordTok{end}
+\CommentTok{\% global correction operator}
+\VariableTok{C\_ell} \OperatorTok{=} \VariableTok{cell2mat}\NormalTok{(}\VariableTok{CT}\NormalTok{)}\OperatorTok{*}\VariableTok{cg2dgH}\OperatorTok{;}
+\CommentTok{\% LOD basis}
+\VariableTok{G} \OperatorTok{=} \VariableTok{P1}\OperatorTok{{-}}\VariableTok{C\_ell}\OperatorTok{;}
+\CommentTok{\%G=cell2mat(CT)*cg2dgH;}
+
+\CommentTok{\%\% Build and solve coarse LOD system}
+\CommentTok{\% coarse degrees of freedom (interior vertices)}
+\VariableTok{dofH} \OperatorTok{=} \VariableTok{true}\NormalTok{(}\VariableTok{NH}\OperatorTok{,}\FloatTok{1}\NormalTok{)}\OperatorTok{;}
+\VariableTok{dofH}\NormalTok{(}\VariableTok{TH}\NormalTok{.}\VariableTok{Dnodes}\NormalTok{) }\OperatorTok{=} \FloatTok{0}\OperatorTok{;}
+\CommentTok{\% LOD stiffness matrix}
+\CommentTok{\% assemble stiffness and mass matrix for continuous finite elements}
+\VariableTok{G0} \OperatorTok{=} \VariableTok{G}\NormalTok{(}\OperatorTok{:,}\VariableTok{dofH}\NormalTok{)}\OperatorTok{;}
+\VariableTok{SHLOD0} \OperatorTok{=}\NormalTok{ ((}\VariableTok{G0}\OperatorTok{.\textquotesingle{}*}\NormalTok{(}\VariableTok{cg2dgh}\OperatorTok{.\textquotesingle{}*}\VariableTok{Shdg}\NormalTok{))}\OperatorTok{*}\VariableTok{cg2dgh}\NormalTok{)}\OperatorTok{*}\VariableTok{G0}\OperatorTok{;}
+\CommentTok{\% right{-}hand side}
+\VariableTok{rhs} \OperatorTok{=} \VariableTok{G0}\OperatorTok{.\textquotesingle{}*}\NormalTok{(}\VariableTok{cg2dgh}\OperatorTok{.\textquotesingle{}*}\NormalTok{(}\VariableTok{Mhdg}\OperatorTok{*}\NormalTok{(}\VariableTok{cg2dgh}\OperatorTok{*}\NormalTok{(}\VariableTok{P1}\OperatorTok{*}\VariableTok{f}\NormalTok{(}\VariableTok{TH}\NormalTok{.}\VariableTok{p}\NormalTok{)))))}\OperatorTok{;}
+\CommentTok{\% solve coarse linear system}
+\VariableTok{uH} \OperatorTok{=} \VariableTok{zeros}\NormalTok{(}\VariableTok{NH}\OperatorTok{,}\FloatTok{1}\NormalTok{)}\OperatorTok{;}
+\VariableTok{uH}\NormalTok{(}\VariableTok{dofH}\NormalTok{) }\OperatorTok{=} \VariableTok{SHLOD0}\OperatorTok{\textbackslash{}}\VariableTok{rhs}\OperatorTok{;}
+\CommentTok{\% reconstruct fine{-}scale information to compute LOD approximation}
+\VariableTok{uHms} \OperatorTok{=} \VariableTok{G}\OperatorTok{*}\VariableTok{uH}\OperatorTok{;}
+
+\CommentTok{\%\% Reference solution}
+\VariableTok{dofh} \OperatorTok{=} \VariableTok{true}\NormalTok{(}\VariableTok{Nh}\OperatorTok{,}\FloatTok{1}\NormalTok{)}\OperatorTok{;}
+\VariableTok{dofh}\NormalTok{(}\VariableTok{Th}\NormalTok{.}\VariableTok{Dnodes}\NormalTok{) }\OperatorTok{=} \FloatTok{0}\OperatorTok{;}
+\VariableTok{cg2dgh0} \OperatorTok{=} \VariableTok{cg2dgh}\NormalTok{(}\OperatorTok{:,}\VariableTok{dofh}\NormalTok{)}\OperatorTok{;}
+\VariableTok{Sh} \OperatorTok{=}\NormalTok{ (}\VariableTok{cg2dgh}\OperatorTok{.\textquotesingle{}*}\VariableTok{Shdg}\NormalTok{)}\OperatorTok{*}\VariableTok{cg2dgh}\OperatorTok{;}
+\VariableTok{Mh} \OperatorTok{=}\NormalTok{ (}\VariableTok{cg2dgh}\OperatorTok{.\textquotesingle{}*}\VariableTok{Mhdg}\NormalTok{)}\OperatorTok{*}\VariableTok{cg2dgh}\OperatorTok{;}
+\VariableTok{uh} \OperatorTok{=} \VariableTok{zeros}\NormalTok{(}\VariableTok{Nh}\OperatorTok{,}\FloatTok{1}\NormalTok{)}\OperatorTok{;}
+\VariableTok{uh}\NormalTok{(}\VariableTok{dofh}\NormalTok{) }\OperatorTok{=} \VariableTok{Sh}\NormalTok{(}\VariableTok{dofh}\OperatorTok{,}\VariableTok{dofh}\NormalTok{)}\OperatorTok{\textbackslash{}}\NormalTok{(}\VariableTok{Mh}\NormalTok{(}\VariableTok{dofh}\OperatorTok{,:}\NormalTok{)}\OperatorTok{*}\VariableTok{f}\NormalTok{(}\VariableTok{Th}\NormalTok{.}\VariableTok{p}\NormalTok{))}\OperatorTok{;}
+
+\CommentTok{\%\% Vizualization}
+\CommentTok{\% We shall finally plot the reference solution along with the LOD}
+\CommentTok{\% approximation. }
+
+\CommentTok{\%\% test}
+\CommentTok{\% figure(1)}
+\CommentTok{\% huHh = trisurf(Th.t,Th.p(:,1),Th.p(:,2),uHms,\textquotesingle{}EdgeColor\textquotesingle{},\textquotesingle{}none\textquotesingle{},\textquotesingle{}FaceColor\textquotesingle{},\textquotesingle{}interp\textquotesingle{});}
+\CommentTok{\% camproj perspective;campos([{-}3,{-}5,1]);daspect([1,1,0.5]);box on;set(gca,\textquotesingle{}BoxStyle\textquotesingle{},\textquotesingle{}full\textquotesingle{});}
+\CommentTok{\% light;lighting phong;camlight(\textquotesingle{}left\textquotesingle{});}
+\CommentTok{\% axis([0 1 0 1 0 0.5]);caxis([0 .3]);}
+
+\VariableTok{figure}
+\VariableTok{set}\NormalTok{(}\VariableTok{gcf}\OperatorTok{,} \SpecialStringTok{\textquotesingle{}Position\textquotesingle{}}\OperatorTok{,}\NormalTok{  [}\FloatTok{10}\OperatorTok{,} \FloatTok{10}\OperatorTok{,} \FloatTok{1200}\OperatorTok{,} \FloatTok{300}\NormalTok{])}
+\CommentTok{\% plot coefficient}
+\VariableTok{subplot}\NormalTok{(}\FloatTok{1}\OperatorTok{,}\FloatTok{4}\OperatorTok{,}\FloatTok{1}\NormalTok{)}
+\NormalTok{[}\VariableTok{X}\OperatorTok{,}\VariableTok{Y}\NormalTok{] }\OperatorTok{=} \VariableTok{meshgrid}\NormalTok{(}\VariableTok{linspace}\NormalTok{(}\FloatTok{0}\OperatorTok{,}\FloatTok{1}\OperatorTok{,}\VariableTok{Neps}\NormalTok{)}\OperatorTok{,}\VariableTok{linspace}\NormalTok{(}\FloatTok{0}\OperatorTok{,}\FloatTok{1}\OperatorTok{,}\VariableTok{Neps}\NormalTok{))}\OperatorTok{;}
+\VariableTok{hA} \OperatorTok{=} \VariableTok{surf}\NormalTok{(}\VariableTok{X}\OperatorTok{,}\VariableTok{Y}\OperatorTok{,}\VariableTok{Aeps}\OperatorTok{,}\SpecialStringTok{\textquotesingle{}EdgeColor\textquotesingle{}}\OperatorTok{,}\SpecialStringTok{\textquotesingle{}none\textquotesingle{}}\NormalTok{)}\OperatorTok{;}
+\VariableTok{hold} \VariableTok{on}\OperatorTok{;} \VariableTok{axis} \VariableTok{equal}\OperatorTok{;} \VariableTok{view}\NormalTok{(}\FloatTok{0}\OperatorTok{,}\FloatTok{90}\NormalTok{)}\OperatorTok{;}\VariableTok{colormap}\NormalTok{(}\VariableTok{gca}\OperatorTok{,}\VariableTok{gray}\NormalTok{)}\OperatorTok{;}\VariableTok{caxis}\NormalTok{([}\VariableTok{alpha}\OperatorTok{,}\VariableTok{beta}\NormalTok{])}\OperatorTok{;}
+\VariableTok{h} \OperatorTok{=} \VariableTok{title}\NormalTok{(\{}\SpecialStringTok{\textquotesingle{}Diffusion coefficient $A$\textquotesingle{}}\OperatorTok{,}\NormalTok{[}\SpecialStringTok{\textquotesingle{}($\textbackslash{}alpha = \textquotesingle{}}\OperatorTok{,}\VariableTok{num2str}\NormalTok{(}\VariableTok{alpha}\NormalTok{)}\OperatorTok{,}\SpecialStringTok{\textquotesingle{}$ (black) , $\textbackslash{}beta = \textquotesingle{}}\OperatorTok{,}\VariableTok{num2str}\NormalTok{(}\VariableTok{beta}\NormalTok{)}\OperatorTok{,}\SpecialStringTok{\textquotesingle{}$ (white))\textquotesingle{}}\NormalTok{]\})}\OperatorTok{;}
+\VariableTok{set}\NormalTok{(}\VariableTok{h}\OperatorTok{,}\SpecialStringTok{\textquotesingle{}Interpreter\textquotesingle{}}\OperatorTok{,}\SpecialStringTok{\textquotesingle{}latex\textquotesingle{}}\NormalTok{)}
+\CommentTok{\% plot reference solution}
+\VariableTok{subplot}\NormalTok{(}\FloatTok{1}\OperatorTok{,}\FloatTok{4}\OperatorTok{,}\FloatTok{2}\NormalTok{)}
+\VariableTok{huh} \OperatorTok{=} \VariableTok{trisurf}\NormalTok{(}\VariableTok{Th}\NormalTok{.}\VariableTok{t}\OperatorTok{,}\VariableTok{Th}\NormalTok{.}\VariableTok{p}\NormalTok{(}\OperatorTok{:,}\FloatTok{1}\NormalTok{)}\OperatorTok{,}\VariableTok{Th}\NormalTok{.}\VariableTok{p}\NormalTok{(}\OperatorTok{:,}\FloatTok{2}\NormalTok{)}\OperatorTok{,}\VariableTok{uh}\OperatorTok{,}\SpecialStringTok{\textquotesingle{}EdgeColor\textquotesingle{}}\OperatorTok{,}\SpecialStringTok{\textquotesingle{}None\textquotesingle{}}\NormalTok{)}\OperatorTok{;}
+\VariableTok{camproj} \VariableTok{perspective}\OperatorTok{;}\VariableTok{campos}\NormalTok{([}\OperatorTok{{-}}\FloatTok{3}\OperatorTok{,{-}}\FloatTok{5}\OperatorTok{,}\FloatTok{1}\NormalTok{])}\OperatorTok{;}\VariableTok{daspect}\NormalTok{([}\FloatTok{1}\OperatorTok{,}\FloatTok{1}\OperatorTok{,}\FloatTok{0.5}\NormalTok{])}\OperatorTok{;}\VariableTok{box} \VariableTok{on}\OperatorTok{;}\VariableTok{set}\NormalTok{(}\VariableTok{gca}\OperatorTok{,}\SpecialStringTok{\textquotesingle{}BoxStyle\textquotesingle{}}\OperatorTok{,}\SpecialStringTok{\textquotesingle{}full\textquotesingle{}}\NormalTok{)}\OperatorTok{;}
+\VariableTok{light}\OperatorTok{;}\VariableTok{lighting} \VariableTok{phong}\OperatorTok{;}\VariableTok{camlight}\NormalTok{(}\SpecialStringTok{\textquotesingle{}left\textquotesingle{}}\NormalTok{)}\OperatorTok{;}
+\VariableTok{axis}\NormalTok{([}\FloatTok{0} \FloatTok{1} \FloatTok{0} \FloatTok{1} \FloatTok{0} \FloatTok{0.5}\NormalTok{])}\OperatorTok{;}\VariableTok{caxis}\NormalTok{([}\FloatTok{0} \FloatTok{.3}\NormalTok{])}\OperatorTok{;}
+\VariableTok{h} \OperatorTok{=} \VariableTok{title}\NormalTok{(\{[}\SpecialStringTok{\textquotesingle{}Reference solution $u\_h$\textquotesingle{}}\NormalTok{]}\OperatorTok{,}\NormalTok{[}\SpecialStringTok{\textquotesingle{}($h=2\^{}\{{-}\textquotesingle{}}\OperatorTok{,}\VariableTok{num2str}\NormalTok{(}\VariableTok{hlevel}\OperatorTok{{-}}\FloatTok{0.5}\NormalTok{)}\OperatorTok{,}\SpecialStringTok{\textquotesingle{}\}$)\textquotesingle{}}\NormalTok{]\})}\OperatorTok{;}
+\VariableTok{set}\NormalTok{(}\VariableTok{h}\OperatorTok{,}\SpecialStringTok{\textquotesingle{}Interpreter\textquotesingle{}}\OperatorTok{,}\SpecialStringTok{\textquotesingle{}latex\textquotesingle{}}\NormalTok{)}
+\CommentTok{\% plot LOD approximation}
+\VariableTok{subplot}\NormalTok{(}\FloatTok{1}\OperatorTok{,}\FloatTok{4}\OperatorTok{,}\FloatTok{3}\NormalTok{)}
+\VariableTok{huHh} \OperatorTok{=} \VariableTok{trisurf}\NormalTok{(}\VariableTok{Th}\NormalTok{.}\VariableTok{t}\OperatorTok{,}\VariableTok{Th}\NormalTok{.}\VariableTok{p}\NormalTok{(}\OperatorTok{:,}\FloatTok{1}\NormalTok{)}\OperatorTok{,}\VariableTok{Th}\NormalTok{.}\VariableTok{p}\NormalTok{(}\OperatorTok{:,}\FloatTok{2}\NormalTok{)}\OperatorTok{,}\VariableTok{uHms}\OperatorTok{,}\SpecialStringTok{\textquotesingle{}EdgeColor\textquotesingle{}}\OperatorTok{,}\SpecialStringTok{\textquotesingle{}none\textquotesingle{}}\OperatorTok{,}\SpecialStringTok{\textquotesingle{}FaceColor\textquotesingle{}}\OperatorTok{,}\SpecialStringTok{\textquotesingle{}interp\textquotesingle{}}\NormalTok{)}\OperatorTok{;}
+\VariableTok{camproj} \VariableTok{perspective}\OperatorTok{;}\VariableTok{campos}\NormalTok{([}\OperatorTok{{-}}\FloatTok{3}\OperatorTok{,{-}}\FloatTok{5}\OperatorTok{,}\FloatTok{1}\NormalTok{])}\OperatorTok{;}\VariableTok{daspect}\NormalTok{([}\FloatTok{1}\OperatorTok{,}\FloatTok{1}\OperatorTok{,}\FloatTok{0.5}\NormalTok{])}\OperatorTok{;}\VariableTok{box} \VariableTok{on}\OperatorTok{;}\VariableTok{set}\NormalTok{(}\VariableTok{gca}\OperatorTok{,}\SpecialStringTok{\textquotesingle{}BoxStyle\textquotesingle{}}\OperatorTok{,}\SpecialStringTok{\textquotesingle{}full\textquotesingle{}}\NormalTok{)}\OperatorTok{;}
+\VariableTok{light}\OperatorTok{;}\VariableTok{lighting} \VariableTok{phong}\OperatorTok{;}\VariableTok{camlight}\NormalTok{(}\SpecialStringTok{\textquotesingle{}left\textquotesingle{}}\NormalTok{)}\OperatorTok{;}
+\VariableTok{axis}\NormalTok{([}\FloatTok{0} \FloatTok{1} \FloatTok{0} \FloatTok{1} \FloatTok{0} \FloatTok{0.5}\NormalTok{])}\OperatorTok{;}\VariableTok{caxis}\NormalTok{([}\FloatTok{0} \FloatTok{.3}\NormalTok{])}\OperatorTok{;}
+\VariableTok{h} \OperatorTok{=} \VariableTok{title}\NormalTok{(\{}\SpecialStringTok{\textquotesingle{}Full LOD approximation $u\^{}\{ms,h\}\_\{H,\textbackslash{}ell\}$\textquotesingle{}}\OperatorTok{,}\NormalTok{[}\SpecialStringTok{\textquotesingle{}($h=2\^{}\{{-}\textquotesingle{}}\OperatorTok{,}\VariableTok{num2str}\NormalTok{(}\VariableTok{hlevel}\OperatorTok{{-}}\FloatTok{0.5}\NormalTok{)}\OperatorTok{,}\SpecialStringTok{\textquotesingle{}\}$, $H=2\^{}\{{-}\textquotesingle{}}\OperatorTok{,}\VariableTok{num2str}\NormalTok{(}\VariableTok{Hlevel}\OperatorTok{{-}}\FloatTok{0.5}\NormalTok{)}\OperatorTok{,}\SpecialStringTok{\textquotesingle{}\}$, $\textbackslash{}ell=\textquotesingle{}}\OperatorTok{,}\VariableTok{num2str}\NormalTok{(}\VariableTok{ell}\NormalTok{)}\OperatorTok{,}\SpecialStringTok{\textquotesingle{}$)\textquotesingle{}}\NormalTok{]\})}\OperatorTok{;}
+\VariableTok{set}\NormalTok{(}\VariableTok{h}\OperatorTok{,}\SpecialStringTok{\textquotesingle{}Interpreter\textquotesingle{}}\OperatorTok{,}\SpecialStringTok{\textquotesingle{}latex\textquotesingle{}}\NormalTok{)}
+\CommentTok{\% plot FE part of LOD approximation}
+\VariableTok{subplot}\NormalTok{(}\FloatTok{1}\OperatorTok{,}\FloatTok{4}\OperatorTok{,}\FloatTok{4}\NormalTok{)}
+ \VariableTok{huHh} \OperatorTok{=} \VariableTok{trisurf}\NormalTok{(}\VariableTok{TH}\NormalTok{.}\VariableTok{t}\OperatorTok{,}\VariableTok{TH}\NormalTok{.}\VariableTok{p}\NormalTok{(}\OperatorTok{:,}\FloatTok{1}\NormalTok{)}\OperatorTok{,}\VariableTok{TH}\NormalTok{.}\VariableTok{p}\NormalTok{(}\OperatorTok{:,}\FloatTok{2}\NormalTok{)}\OperatorTok{,}\VariableTok{uH}\OperatorTok{,}\SpecialStringTok{\textquotesingle{}EdgeColor\textquotesingle{}}\OperatorTok{,}\SpecialStringTok{\textquotesingle{}k\textquotesingle{}}\OperatorTok{,}\SpecialStringTok{\textquotesingle{}LineWidth\textquotesingle{}}\OperatorTok{,}\FloatTok{0.5}\OperatorTok{,}\SpecialStringTok{\textquotesingle{}FaceColor\textquotesingle{}}\OperatorTok{,}\SpecialStringTok{\textquotesingle{}interp\textquotesingle{}}\NormalTok{)}\OperatorTok{;}
+\VariableTok{camproj} \VariableTok{perspective}\OperatorTok{;}\VariableTok{campos}\NormalTok{([}\OperatorTok{{-}}\FloatTok{3}\OperatorTok{,{-}}\FloatTok{5}\OperatorTok{,}\FloatTok{1}\NormalTok{])}\OperatorTok{;}\VariableTok{daspect}\NormalTok{([}\FloatTok{1}\OperatorTok{,}\FloatTok{1}\OperatorTok{,}\FloatTok{0.5}\NormalTok{])}\OperatorTok{;}\VariableTok{box} \VariableTok{on}\OperatorTok{;}\VariableTok{set}\NormalTok{(}\VariableTok{gca}\OperatorTok{,}\SpecialStringTok{\textquotesingle{}BoxStyle\textquotesingle{}}\OperatorTok{,}\SpecialStringTok{\textquotesingle{}full\textquotesingle{}}\NormalTok{)}\OperatorTok{;}
+\VariableTok{light}\OperatorTok{;}\VariableTok{lighting} \VariableTok{phong}\OperatorTok{;}\VariableTok{camlight}\NormalTok{(}\SpecialStringTok{\textquotesingle{}left\textquotesingle{}}\NormalTok{)}\OperatorTok{;}
+\VariableTok{axis}\NormalTok{([}\FloatTok{0} \FloatTok{1} \FloatTok{0} \FloatTok{1} \FloatTok{0} \FloatTok{0.5}\NormalTok{])}\OperatorTok{;}\VariableTok{caxis}\NormalTok{([}\FloatTok{0} \FloatTok{.3}\NormalTok{])}\OperatorTok{;}
+\VariableTok{h} \OperatorTok{=} \VariableTok{title}\NormalTok{(\{[}\SpecialStringTok{\textquotesingle{}FE{-}part of LOD approximation $u\^{}\{h\}\_\{H,\textbackslash{}ell\}$\textquotesingle{}}\NormalTok{]}\OperatorTok{,}\NormalTok{[}\SpecialStringTok{\textquotesingle{}($h=2\^{}\{{-}\textquotesingle{}}\OperatorTok{,}\VariableTok{num2str}\NormalTok{(}\VariableTok{hlevel}\OperatorTok{{-}}\FloatTok{0.5}\NormalTok{)}\OperatorTok{,}\SpecialStringTok{\textquotesingle{}\}$, $H=2\^{}\{{-}\textquotesingle{}}\OperatorTok{,}\VariableTok{num2str}\NormalTok{(}\VariableTok{Hlevel}\OperatorTok{{-}}\FloatTok{0.5}\NormalTok{)}\OperatorTok{,}\SpecialStringTok{\textquotesingle{}\}$, $\textbackslash{}ell=\textquotesingle{}}\OperatorTok{,}\VariableTok{num2str}\NormalTok{(}\VariableTok{ell}\NormalTok{)}\OperatorTok{,}\SpecialStringTok{\textquotesingle{}$)\textquotesingle{}}\NormalTok{]\})}\OperatorTok{;}
+\VariableTok{set}\NormalTok{(}\VariableTok{h}\OperatorTok{,}\SpecialStringTok{\textquotesingle{}Interpreter\textquotesingle{}}\OperatorTok{,}\SpecialStringTok{\textquotesingle{}latex\textquotesingle{}}\NormalTok{)}
+\CommentTok{\% \% plot difference of LOD approximation and reference solution}
+\CommentTok{\% subplot(1,4,4)}
+\CommentTok{\% huHh = trisurf(Th.t,Th.p(:,1),Th.p(:,2),uh{-}uHms,\textquotesingle{}EdgeColor\textquotesingle{},\textquotesingle{}none\textquotesingle{},\textquotesingle{}FaceColor\textquotesingle{},\textquotesingle{}interp\textquotesingle{});}
+\CommentTok{\% camproj perspective;campos([{-}3,{-}5,1]);daspect([1,1,0.5]);box on;set(gca,\textquotesingle{}BoxStyle\textquotesingle{},\textquotesingle{}full\textquotesingle{});}
+\CommentTok{\% light;lighting phong;camlight(\textquotesingle{}left\textquotesingle{});}
+
+
+\CommentTok{\%\% Error}
+\CommentTok{\% Error of the LOD approximation in the energy norm}
+\VariableTok{fprintf}\NormalTok{(}\SpecialStringTok{\textquotesingle{}LOD{-}Error (in energy norm): \%7.5e\textbackslash{}n\textquotesingle{}}\OperatorTok{,}\VariableTok{sqrt}\NormalTok{((}\VariableTok{uh}\OperatorTok{{-}}\VariableTok{uHms}\NormalTok{)}\OperatorTok{.\textquotesingle{}*}\NormalTok{(}\VariableTok{Sh}\OperatorTok{*}\NormalTok{(}\VariableTok{uh}\OperatorTok{{-}}\VariableTok{uHms}\NormalTok{))))}\OperatorTok{;}
+\CommentTok{\% Error of the LOD approximation in the L\^{}2 norm}
+\VariableTok{fprintf}\NormalTok{(}\SpecialStringTok{\textquotesingle{}LOD{-}Error (in L2 norm): \%7.5e\textbackslash{}n\textquotesingle{}}\OperatorTok{,}\VariableTok{sqrt}\NormalTok{((}\VariableTok{uh}\OperatorTok{{-}}\VariableTok{uHms}\NormalTok{)}\OperatorTok{.\textquotesingle{}*}\NormalTok{(}\VariableTok{Mh}\OperatorTok{*}\NormalTok{(}\VariableTok{uh}\OperatorTok{{-}}\VariableTok{uHms}\NormalTok{))))}\OperatorTok{;}
+\CommentTok{\% Error of FE{-}part og the LOD approximation in the L\^{}2 norm}
+\VariableTok{fprintf}\NormalTok{(}\SpecialStringTok{\textquotesingle{}Error of FE{-}part of LOD (in L2 norm): \%7.5e\textbackslash{}n\textquotesingle{}}\OperatorTok{,}\VariableTok{sqrt}\NormalTok{((}\VariableTok{uh}\OperatorTok{{-}}\VariableTok{P1}\OperatorTok{*}\VariableTok{uH}\NormalTok{)}\OperatorTok{.\textquotesingle{}*}\NormalTok{(}\VariableTok{Mh}\OperatorTok{*}\NormalTok{(}\VariableTok{uh}\OperatorTok{{-}}\VariableTok{P1}\OperatorTok{*}\VariableTok{uH}\NormalTok{))))}\OperatorTok{;}
+
+
+\CommentTok{\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%}
+\CommentTok{\%\% Subroutines }
+\CommentTok{\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%\%}
+
+\CommentTok{\%\% Function refineMesh }
+\CommentTok{\% refines a coarse triangulation TH nref times by applying the }
+\CommentTok{\% function REFINE nref times. Suitable restriction and prolongation}
+\CommentTok{\% operator between corresponding mesh functions are computed}
+\KeywordTok{function}\NormalTok{ [}\VariableTok{Th}\OperatorTok{,}\VariableTok{P1}\OperatorTok{,}\VariableTok{R1}\OperatorTok{,}\VariableTok{P0}\OperatorTok{,}\VariableTok{P1dg}\NormalTok{] }\OperatorTok{=} \VariableTok{refineMesh}\NormalTok{(}\VariableTok{Th}\OperatorTok{,}\VariableTok{nref}\NormalTok{)}
+    \CommentTok{\% number of vertices}
+    \VariableTok{NH} \OperatorTok{=} \VariableTok{size}\NormalTok{(}\VariableTok{Th}\NormalTok{.}\VariableTok{p}\OperatorTok{,}\FloatTok{1}\NormalTok{)}\OperatorTok{;}
+    \CommentTok{\% compute fine reference mesh}
+    \VariableTok{P1} \OperatorTok{=} \VariableTok{speye}\NormalTok{(}\VariableTok{NH}\NormalTok{)}\OperatorTok{;}
+    \VariableTok{P0} \OperatorTok{=} \VariableTok{speye}\NormalTok{(}\VariableTok{size}\NormalTok{(}\VariableTok{Th}\NormalTok{.}\VariableTok{t}\OperatorTok{,}\FloatTok{1}\NormalTok{))}\OperatorTok{;}
+    \VariableTok{P1dg} \OperatorTok{=} \VariableTok{speye}\NormalTok{(}\VariableTok{numel}\NormalTok{(}\VariableTok{Th}\NormalTok{.}\VariableTok{t}\NormalTok{))}\OperatorTok{;}
+    \KeywordTok{for} \VariableTok{k}\OperatorTok{=}\FloatTok{1}\OperatorTok{:}\VariableTok{nref}
+\NormalTok{        [}\VariableTok{Th}\OperatorTok{,}\VariableTok{p}\OperatorTok{,}\VariableTok{p0}\OperatorTok{,}\VariableTok{p1dg}\NormalTok{] }\OperatorTok{=} \VariableTok{refine}\NormalTok{(}\VariableTok{Th}\NormalTok{)}\OperatorTok{;}
+        \VariableTok{P1dg} \OperatorTok{=} \VariableTok{p1dg}\OperatorTok{*}\VariableTok{P1dg}\OperatorTok{;}
+        \VariableTok{P1} \OperatorTok{=} \VariableTok{p}\OperatorTok{*}\VariableTok{P1}\OperatorTok{;}
+        \VariableTok{P0} \OperatorTok{=} \VariableTok{p0}\OperatorTok{*}\VariableTok{P0}\OperatorTok{;}
+    \KeywordTok{end}
+    \CommentTok{\% compute coarse mesh nodal interpolant}
+    \VariableTok{Nh} \OperatorTok{=} \VariableTok{size}\NormalTok{(}\VariableTok{Th}\NormalTok{.}\VariableTok{p}\OperatorTok{,}\FloatTok{1}\NormalTok{)}\OperatorTok{;}
+\NormalTok{    [}\VariableTok{i}\OperatorTok{,}\VariableTok{j}\NormalTok{] }\OperatorTok{=} \VariableTok{find}\NormalTok{(}\VariableTok{P1}\OperatorTok{\textgreater{}}\FloatTok{1}\OperatorTok{{-}}\FloatTok{2}\OperatorTok{*}\VariableTok{eps}\NormalTok{)}\OperatorTok{;}
+    \VariableTok{R1} \OperatorTok{=} \VariableTok{sparse}\NormalTok{(}\VariableTok{j}\OperatorTok{,}\VariableTok{i}\OperatorTok{,}\VariableTok{ones}\NormalTok{(}\VariableTok{length}\NormalTok{(}\VariableTok{i}\NormalTok{)}\OperatorTok{,}\FloatTok{1}\NormalTok{)}\OperatorTok{,}\VariableTok{NH}\OperatorTok{,}\VariableTok{Nh}\NormalTok{)}\OperatorTok{;}
+\KeywordTok{end}
+\CommentTok{\% End of function refineMesh}
+
+\CommentTok{\%\% Function refine}
+\CommentTok{\% refines the current triangulation by dividing}
+\CommentTok{\% each marked element into 2\^{}dim congruent elements (red refinement)}
+\KeywordTok{function}\NormalTok{ [}\VariableTok{T}\OperatorTok{,}\VariableTok{P}\OperatorTok{,}\VariableTok{P0}\OperatorTok{,}\VariableTok{P1dg}\NormalTok{] }\OperatorTok{=} \VariableTok{refine}\NormalTok{(}\VariableTok{T}\NormalTok{)}
+    \CommentTok{\% Construct data structure}
+\NormalTok{    [}\VariableTok{np}\NormalTok{] }\OperatorTok{=} \VariableTok{size}\NormalTok{(}\VariableTok{T}\NormalTok{.}\VariableTok{p}\OperatorTok{,}\FloatTok{1}\NormalTok{)}\OperatorTok{;} 
+    \VariableTok{nt} \OperatorTok{=} \VariableTok{size}\NormalTok{(}\VariableTok{T}\NormalTok{.}\VariableTok{t}\OperatorTok{,}\FloatTok{1}\NormalTok{)}\OperatorTok{;}
+\NormalTok{    [}\VariableTok{e}\OperatorTok{,}\VariableTok{nmbe}\NormalTok{] }\OperatorTok{=} \VariableTok{computeEdges}\NormalTok{(}\VariableTok{T}\NormalTok{)}\OperatorTok{;}
+    \VariableTok{ne} \OperatorTok{=} \VariableTok{size}\NormalTok{(}\VariableTok{e}\OperatorTok{,}\FloatTok{1}\NormalTok{)}\OperatorTok{;}
+    \VariableTok{d2p} \OperatorTok{=} \VariableTok{sparse}\NormalTok{(}\VariableTok{e}\OperatorTok{,}\VariableTok{e}\NormalTok{(}\OperatorTok{:,}\NormalTok{[}\FloatTok{2}\OperatorTok{,}\FloatTok{1}\NormalTok{])}\OperatorTok{,}\NormalTok{(}\FloatTok{1}\OperatorTok{:}\VariableTok{ne}\NormalTok{)}\OperatorTok{\textquotesingle{}*}\NormalTok{[}\FloatTok{1} \FloatTok{1}\NormalTok{]}\OperatorTok{,}\VariableTok{np}\OperatorTok{,}\VariableTok{np}\NormalTok{)}\OperatorTok{;}
+    \CommentTok{\% New nodes from the mid points of each edge}
+    \VariableTok{newnode} \OperatorTok{=} \FloatTok{0.5}\OperatorTok{.*}\NormalTok{(}\VariableTok{T}\NormalTok{.}\VariableTok{p}\NormalTok{(}\VariableTok{e}\NormalTok{(}\OperatorTok{:,}\FloatTok{1}\NormalTok{)}\OperatorTok{,:}\NormalTok{)}\OperatorTok{+}\VariableTok{T}\NormalTok{.}\VariableTok{p}\NormalTok{(}\VariableTok{e}\NormalTok{(}\OperatorTok{:,}\FloatTok{2}\NormalTok{)}\OperatorTok{,:}\NormalTok{))}\OperatorTok{;} 
+    \VariableTok{P} \OperatorTok{=} \VariableTok{sparse}\NormalTok{((}\FloatTok{1}\OperatorTok{:}\VariableTok{ne}\NormalTok{)}\OperatorTok{\textquotesingle{}*}\NormalTok{[}\FloatTok{1} \FloatTok{1}\NormalTok{]}\OperatorTok{,}\VariableTok{e}\OperatorTok{,}\FloatTok{.5}\OperatorTok{,}\VariableTok{ne}\OperatorTok{,}\VariableTok{np}\NormalTok{)}\OperatorTok{;}
+    \VariableTok{T}\NormalTok{.}\VariableTok{p} \OperatorTok{=}\NormalTok{ [}\VariableTok{T}\NormalTok{.}\VariableTok{p}\OperatorTok{;} \VariableTok{newnode}\NormalTok{]}\OperatorTok{;} 
+    \VariableTok{P} \OperatorTok{=}\NormalTok{ [}\VariableTok{speye}\NormalTok{(}\VariableTok{np}\NormalTok{)}\OperatorTok{;}\VariableTok{P}\NormalTok{]}\OperatorTok{;}
+    \VariableTok{emarker} \OperatorTok{=}\NormalTok{ (}\VariableTok{np}\OperatorTok{+}\FloatTok{1}\OperatorTok{:}\VariableTok{np}\OperatorTok{+}\VariableTok{ne}\NormalTok{)}\OperatorTok{\textquotesingle{};}
+    \VariableTok{p} \OperatorTok{=}\NormalTok{ [}\VariableTok{T}\NormalTok{.}\VariableTok{t}\OperatorTok{,}\VariableTok{emarker}\NormalTok{(}\VariableTok{d2p}\NormalTok{(}\VariableTok{T}\NormalTok{.}\VariableTok{t}\NormalTok{(}\OperatorTok{:,}\FloatTok{1}\NormalTok{)}\OperatorTok{+}\VariableTok{np}\OperatorTok{*}\NormalTok{(}\VariableTok{T}\NormalTok{.}\VariableTok{t}\NormalTok{(}\OperatorTok{:,}\FloatTok{2}\NormalTok{)}\OperatorTok{{-}}\FloatTok{1}\NormalTok{)))}\OperatorTok{,...}
+             \VariableTok{emarker}\NormalTok{(}\VariableTok{d2p}\NormalTok{(}\VariableTok{T}\NormalTok{.}\VariableTok{t}\NormalTok{(}\OperatorTok{:,}\FloatTok{2}\NormalTok{)}\OperatorTok{+}\VariableTok{np}\OperatorTok{*}\NormalTok{(}\VariableTok{T}\NormalTok{.}\VariableTok{t}\NormalTok{(}\OperatorTok{:,}\FloatTok{3}\NormalTok{)}\OperatorTok{{-}}\FloatTok{1}\NormalTok{)))}\OperatorTok{,...}
+             \VariableTok{emarker}\NormalTok{(}\VariableTok{d2p}\NormalTok{(}\VariableTok{T}\NormalTok{.}\VariableTok{t}\NormalTok{(}\OperatorTok{:,}\FloatTok{3}\NormalTok{)}\OperatorTok{+}\VariableTok{np}\OperatorTok{*}\NormalTok{(}\VariableTok{T}\NormalTok{.}\VariableTok{t}\NormalTok{(}\OperatorTok{:,}\FloatTok{1}\NormalTok{)}\OperatorTok{{-}}\FloatTok{1}\NormalTok{)))]}\OperatorTok{;}
+    \VariableTok{T}\NormalTok{.}\VariableTok{t} \OperatorTok{=}\NormalTok{ [}\VariableTok{p}\NormalTok{(}\OperatorTok{:,}\NormalTok{[}\FloatTok{1}\OperatorTok{,}\FloatTok{4}\OperatorTok{,}\FloatTok{6}\NormalTok{])}\OperatorTok{;}\VariableTok{p}\NormalTok{(}\OperatorTok{:,}\NormalTok{[}\FloatTok{4}\OperatorTok{,}\FloatTok{2}\OperatorTok{,}\FloatTok{5}\NormalTok{])}\OperatorTok{;}\VariableTok{p}\NormalTok{(}\OperatorTok{:,}\NormalTok{[}\FloatTok{6}\OperatorTok{,}\FloatTok{5}\OperatorTok{,}\FloatTok{3}\NormalTok{])}\OperatorTok{;}\VariableTok{p}\NormalTok{(}\OperatorTok{:,}\NormalTok{[}\FloatTok{4}\OperatorTok{,}\FloatTok{5}\OperatorTok{,}\FloatTok{6}\NormalTok{])]}\OperatorTok{;}
+    \VariableTok{tnew2t} \OperatorTok{=} \VariableTok{repmat}\NormalTok{(}\FloatTok{1}\OperatorTok{:}\VariableTok{nt}\OperatorTok{,}\FloatTok{1}\OperatorTok{,}\FloatTok{4}\NormalTok{)}\OperatorTok{.\textquotesingle{};}
+    \VariableTok{E} \OperatorTok{=} \VariableTok{speye}\NormalTok{(}\VariableTok{nt}\NormalTok{)}\OperatorTok{;}     
+    \VariableTok{P1dg} \OperatorTok{=}\NormalTok{ [}\VariableTok{kron}\NormalTok{(}\VariableTok{E}\OperatorTok{,}\NormalTok{[}\FloatTok{1} \FloatTok{0} \FloatTok{0}\OperatorTok{;}\FloatTok{.5} \FloatTok{.5} \FloatTok{0}\OperatorTok{;}\FloatTok{.5} \FloatTok{0} \FloatTok{.5}\NormalTok{])}\OperatorTok{;}\VariableTok{kron}\NormalTok{(}\VariableTok{E}\OperatorTok{,}\NormalTok{[}\FloatTok{.5} \FloatTok{.5} \FloatTok{0}\OperatorTok{;}\FloatTok{0} \FloatTok{1} \FloatTok{0}\OperatorTok{;}\FloatTok{0} \FloatTok{.5} \FloatTok{.5}\NormalTok{])}\OperatorTok{;}
+            \VariableTok{kron}\NormalTok{(}\VariableTok{E}\OperatorTok{,}\NormalTok{[}\FloatTok{.5} \FloatTok{0} \FloatTok{.5}\OperatorTok{;}\FloatTok{0} \FloatTok{.5} \FloatTok{.5}\OperatorTok{;}\FloatTok{0} \FloatTok{0} \FloatTok{1}\NormalTok{])}\OperatorTok{;}\VariableTok{kron}\NormalTok{(}\VariableTok{E}\OperatorTok{,}\NormalTok{[}\FloatTok{.5} \FloatTok{.5} \FloatTok{0}\OperatorTok{;}\FloatTok{0} \FloatTok{.5} \FloatTok{.5}\OperatorTok{;}\FloatTok{.5} \FloatTok{0} \FloatTok{.5}\NormalTok{])]}\OperatorTok{;}
+    \VariableTok{Dnodes} \OperatorTok{=} \VariableTok{false}\NormalTok{(}\VariableTok{np}\OperatorTok{,}\FloatTok{1}\NormalTok{)}\OperatorTok{;}
+    \VariableTok{Dnodes}\NormalTok{(}\VariableTok{T}\NormalTok{.}\VariableTok{Dnodes}\NormalTok{) }\OperatorTok{=} \VariableTok{true}\OperatorTok{;}
+    \VariableTok{T}\NormalTok{.}\VariableTok{Dnodes} \OperatorTok{=} \VariableTok{find}\NormalTok{([}\VariableTok{Dnodes}\OperatorTok{;}\VariableTok{Dnodes}\NormalTok{(}\VariableTok{e}\NormalTok{(}\OperatorTok{:,}\FloatTok{1}\NormalTok{)) }\OperatorTok{\&} \VariableTok{Dnodes}\NormalTok{(}\VariableTok{e}\NormalTok{(}\OperatorTok{:,}\FloatTok{2}\NormalTok{)) }\OperatorTok{\&} \VariableTok{nmbe}\OperatorTok{==}\FloatTok{1}\NormalTok{])}\OperatorTok{;}
+    \VariableTok{P0} \OperatorTok{=} \VariableTok{sparse}\NormalTok{((}\FloatTok{1}\OperatorTok{:}\VariableTok{length}\NormalTok{(}\VariableTok{tnew2t}\NormalTok{))}\OperatorTok{\textquotesingle{},}\VariableTok{tnew2t}\OperatorTok{,}\FloatTok{1}\OperatorTok{,}\VariableTok{length}\NormalTok{(}\VariableTok{tnew2t}\NormalTok{)}\OperatorTok{,}\VariableTok{nt}\NormalTok{)}\OperatorTok{;}
+\KeywordTok{end}
+\CommentTok{\% End of function REFINE}
+
+\CommentTok{\%\% Function computeEdges }
+\CommentTok{\% computes the edges of the triangulation T}
+\KeywordTok{function}\NormalTok{ [}\VariableTok{e}\OperatorTok{,}\VariableTok{nmbe}\NormalTok{] }\OperatorTok{=} \VariableTok{computeEdges}\NormalTok{(}\VariableTok{T}\NormalTok{)}
+    \VariableTok{np} \OperatorTok{=} \VariableTok{size}\NormalTok{(}\VariableTok{T}\NormalTok{.}\VariableTok{p}\OperatorTok{,}\FloatTok{1}\NormalTok{)}\OperatorTok{;}
+    \VariableTok{e} \OperatorTok{=}\NormalTok{ [}\VariableTok{T}\NormalTok{.}\VariableTok{t}\NormalTok{(}\OperatorTok{:,}\NormalTok{[}\FloatTok{1}\OperatorTok{,}\FloatTok{2}\NormalTok{])}\OperatorTok{;} \VariableTok{T}\NormalTok{.}\VariableTok{t}\NormalTok{(}\OperatorTok{:,}\NormalTok{[}\FloatTok{1}\OperatorTok{,}\FloatTok{3}\NormalTok{])}\OperatorTok{;} \VariableTok{T}\NormalTok{.}\VariableTok{t}\NormalTok{(}\OperatorTok{:,}\NormalTok{[}\FloatTok{2}\OperatorTok{,}\FloatTok{3}\NormalTok{])]}\OperatorTok{;}
+    \VariableTok{e} \OperatorTok{=} \VariableTok{sort}\NormalTok{(}\VariableTok{e}\OperatorTok{,}\FloatTok{2}\NormalTok{)}\OperatorTok{;}
+    \VariableTok{d2p} \OperatorTok{=} \VariableTok{sparse}\NormalTok{(}\VariableTok{e}\NormalTok{(}\OperatorTok{:,}\FloatTok{1}\NormalTok{)}\OperatorTok{,}\VariableTok{e}\NormalTok{(}\OperatorTok{:,}\FloatTok{2}\NormalTok{)}\OperatorTok{,}\FloatTok{1}\OperatorTok{,}\VariableTok{np}\OperatorTok{,}\VariableTok{np}\NormalTok{)}\OperatorTok{;}
+\NormalTok{    [}\VariableTok{e1}\OperatorTok{,}\VariableTok{e2}\OperatorTok{,}\VariableTok{nmbe}\NormalTok{] }\OperatorTok{=} \VariableTok{find}\NormalTok{(}\VariableTok{d2p}\NormalTok{)}\OperatorTok{;}
+    \VariableTok{e} \OperatorTok{=}\NormalTok{ [}\VariableTok{e1}\OperatorTok{,}\VariableTok{e2}\NormalTok{]}\OperatorTok{;}
+\KeywordTok{end}
+\CommentTok{\% End of function computeEdges}
+
+\CommentTok{\%\% Function assembleStiffnessMatrixDG calculates stiffness matrix with }
+\CommentTok{\% respect to simplicial mesh Th with optional Th{-}piecewise constant scalar }
+\CommentTok{\% diffusion coefficient coeff}
+\CommentTok{\% discontinuous Galerkin}
+\KeywordTok{function}\NormalTok{ [}\VariableTok{S}\NormalTok{] }\OperatorTok{=} \VariableTok{assembleStiffnessMatrixDG}\NormalTok{(}\VariableTok{Th}\OperatorTok{,}\VariableTok{coeff}\NormalTok{)}
+    \CommentTok{\% compute gradients of FE functions}
+    \VariableTok{ve1} \OperatorTok{=} \VariableTok{Th}\NormalTok{.}\VariableTok{p}\NormalTok{(}\VariableTok{Th}\NormalTok{.}\VariableTok{t}\NormalTok{(}\OperatorTok{:,}\FloatTok{3}\NormalTok{)}\OperatorTok{,:}\NormalTok{)}\OperatorTok{{-}}\VariableTok{Th}\NormalTok{.}\VariableTok{p}\NormalTok{(}\VariableTok{Th}\NormalTok{.}\VariableTok{t}\NormalTok{(}\OperatorTok{:,}\FloatTok{2}\NormalTok{)}\OperatorTok{,:}\NormalTok{)}\OperatorTok{;}
+    \VariableTok{ve2} \OperatorTok{=} \VariableTok{Th}\NormalTok{.}\VariableTok{p}\NormalTok{(}\VariableTok{Th}\NormalTok{.}\VariableTok{t}\NormalTok{(}\OperatorTok{:,}\FloatTok{1}\NormalTok{)}\OperatorTok{,:}\NormalTok{)}\OperatorTok{{-}}\VariableTok{Th}\NormalTok{.}\VariableTok{p}\NormalTok{(}\VariableTok{Th}\NormalTok{.}\VariableTok{t}\NormalTok{(}\OperatorTok{:,}\FloatTok{3}\NormalTok{)}\OperatorTok{,:}\NormalTok{)}\OperatorTok{;}
+    \VariableTok{ve3} \OperatorTok{=} \VariableTok{Th}\NormalTok{.}\VariableTok{p}\NormalTok{(}\VariableTok{Th}\NormalTok{.}\VariableTok{t}\NormalTok{(}\OperatorTok{:,}\FloatTok{2}\NormalTok{)}\OperatorTok{,:}\NormalTok{)}\OperatorTok{{-}}\VariableTok{Th}\NormalTok{.}\VariableTok{p}\NormalTok{(}\VariableTok{Th}\NormalTok{.}\VariableTok{t}\NormalTok{(}\OperatorTok{:,}\FloatTok{1}\NormalTok{)}\OperatorTok{,:}\NormalTok{)}\OperatorTok{;}
+    \VariableTok{area2} \OperatorTok{=} \VariableTok{abs}\NormalTok{(}\VariableTok{ve3}\NormalTok{(}\OperatorTok{:,}\FloatTok{2}\NormalTok{)}\OperatorTok{.*}\VariableTok{ve2}\NormalTok{(}\OperatorTok{:,}\FloatTok{1}\NormalTok{)}\OperatorTok{{-}}\VariableTok{ve3}\NormalTok{(}\OperatorTok{:,}\FloatTok{1}\NormalTok{)}\OperatorTok{.*}\VariableTok{ve2}\NormalTok{(}\OperatorTok{:,}\FloatTok{2}\NormalTok{))}\OperatorTok{;}
+    \VariableTok{G}\NormalTok{(}\OperatorTok{:,:,}\FloatTok{1}\NormalTok{)}\OperatorTok{=}\NormalTok{[}\OperatorTok{{-}}\VariableTok{ve1}\NormalTok{(}\OperatorTok{:,}\FloatTok{2}\NormalTok{) }\VariableTok{ve1}\NormalTok{(}\OperatorTok{:,}\FloatTok{1}\NormalTok{)]}\OperatorTok{./}\NormalTok{(}\VariableTok{area2}\OperatorTok{*}\NormalTok{[}\FloatTok{1} \FloatTok{1}\NormalTok{])}\OperatorTok{;}
+    \VariableTok{G}\NormalTok{(}\OperatorTok{:,:,}\FloatTok{2}\NormalTok{)}\OperatorTok{=}\NormalTok{[}\OperatorTok{{-}}\VariableTok{ve2}\NormalTok{(}\OperatorTok{:,}\FloatTok{2}\NormalTok{) }\VariableTok{ve2}\NormalTok{(}\OperatorTok{:,}\FloatTok{1}\NormalTok{)]}\OperatorTok{./}\NormalTok{(}\VariableTok{area2}\OperatorTok{*}\NormalTok{[}\FloatTok{1} \FloatTok{1}\NormalTok{])}\OperatorTok{;}
+    \VariableTok{G}\NormalTok{(}\OperatorTok{:,:,}\FloatTok{3}\NormalTok{)}\OperatorTok{=}\NormalTok{[}\OperatorTok{{-}}\VariableTok{ve3}\NormalTok{(}\OperatorTok{:,}\FloatTok{2}\NormalTok{) }\VariableTok{ve3}\NormalTok{(}\OperatorTok{:,}\FloatTok{1}\NormalTok{)]}\OperatorTok{./}\NormalTok{(}\VariableTok{area2}\OperatorTok{*}\NormalTok{[}\FloatTok{1} \FloatTok{1}\NormalTok{])}\OperatorTok{;}
+    \VariableTok{c} \OperatorTok{=} \VariableTok{coeff}\OperatorTok{.*}\VariableTok{computeArea}\NormalTok{(}\VariableTok{Th}\NormalTok{)}\OperatorTok{;}
+    \CommentTok{\% local stiffness matrices}
+    \VariableTok{S} \OperatorTok{=} \VariableTok{zeros}\NormalTok{(}\VariableTok{size}\NormalTok{(}\VariableTok{Th}\NormalTok{.}\VariableTok{t}\OperatorTok{,}\FloatTok{1}\NormalTok{)}\OperatorTok{,}\FloatTok{9}\NormalTok{)}\OperatorTok{;}
+    \KeywordTok{for} \VariableTok{j} \OperatorTok{=} \FloatTok{1}\OperatorTok{:}\FloatTok{3}
+        \KeywordTok{for} \VariableTok{k} \OperatorTok{=} \FloatTok{1}\OperatorTok{:}\FloatTok{3}
+            \VariableTok{S}\NormalTok{(}\OperatorTok{:,}\VariableTok{k}\OperatorTok{+}\FloatTok{3}\OperatorTok{*}\NormalTok{(}\VariableTok{j}\OperatorTok{{-}}\FloatTok{1}\NormalTok{)) }\OperatorTok{=} \VariableTok{c}\OperatorTok{.*}\VariableTok{dot}\NormalTok{(}\VariableTok{G}\NormalTok{(}\OperatorTok{:,:,}\VariableTok{j}\NormalTok{)}\OperatorTok{,}\VariableTok{G}\NormalTok{(}\OperatorTok{:,:,}\VariableTok{k}\NormalTok{)}\OperatorTok{,}\FloatTok{2}\NormalTok{)}\OperatorTok{;}
+        \KeywordTok{end}
+    \KeywordTok{end}
+    \CommentTok{\% create global matrix}
+    \VariableTok{I} \OperatorTok{=}\NormalTok{ (}\FloatTok{1}\OperatorTok{:}\FloatTok{3}\NormalTok{)}\OperatorTok{.\textquotesingle{}*}\VariableTok{ones}\NormalTok{(}\FloatTok{1}\OperatorTok{,}\FloatTok{3}\NormalTok{)}\OperatorTok{;}
+    \VariableTok{ndof} \OperatorTok{=} \VariableTok{numel}\NormalTok{(}\VariableTok{Th}\NormalTok{.}\VariableTok{t}\NormalTok{)}\OperatorTok{;}
+    \VariableTok{idx} \OperatorTok{=} \VariableTok{reshape}\NormalTok{(}\FloatTok{1}\OperatorTok{:}\VariableTok{ndof}\OperatorTok{,}\FloatTok{3}\OperatorTok{,}\NormalTok{[])}\OperatorTok{.\textquotesingle{};}
+    \VariableTok{S} \OperatorTok{=} \VariableTok{sparse}\NormalTok{(}\VariableTok{idx}\NormalTok{(}\OperatorTok{:,}\VariableTok{reshape}\NormalTok{(}\VariableTok{I}\OperatorTok{.\textquotesingle{},}\FloatTok{1}\OperatorTok{,}\FloatTok{9}\NormalTok{))}\OperatorTok{,}\VariableTok{idx}\NormalTok{(}\OperatorTok{:,}\VariableTok{reshape}\NormalTok{(}\VariableTok{I}\OperatorTok{,}\FloatTok{1}\OperatorTok{,}\FloatTok{9}\NormalTok{))}\OperatorTok{,}\VariableTok{S}\OperatorTok{,}\VariableTok{ndof}\OperatorTok{,}\VariableTok{ndof}\NormalTok{)}\OperatorTok{;}
+\KeywordTok{end}
+\CommentTok{\% End of function assembleStiffnessMatrix}
+
+\CommentTok{\%\% Function computeArea}
+\CommentTok{\% calculates the area of the elements of the triangulation T}
+\KeywordTok{function} \VariableTok{v} \OperatorTok{=} \VariableTok{computeArea}\NormalTok{(}\VariableTok{T}\NormalTok{)}
+    \VariableTok{d12} \OperatorTok{=} \VariableTok{T}\NormalTok{.}\VariableTok{p}\NormalTok{(}\VariableTok{T}\NormalTok{.}\VariableTok{t}\NormalTok{(}\OperatorTok{:,}\FloatTok{2}\NormalTok{)}\OperatorTok{,:}\NormalTok{)}\OperatorTok{{-}}\VariableTok{T}\NormalTok{.}\VariableTok{p}\NormalTok{(}\VariableTok{T}\NormalTok{.}\VariableTok{t}\NormalTok{(}\OperatorTok{:,}\FloatTok{1}\NormalTok{)}\OperatorTok{,:}\NormalTok{)}\OperatorTok{;}
+    \VariableTok{d13} \OperatorTok{=} \VariableTok{T}\NormalTok{.}\VariableTok{p}\NormalTok{(}\VariableTok{T}\NormalTok{.}\VariableTok{t}\NormalTok{(}\OperatorTok{:,}\FloatTok{3}\NormalTok{)}\OperatorTok{,:}\NormalTok{)}\OperatorTok{{-}}\VariableTok{T}\NormalTok{.}\VariableTok{p}\NormalTok{(}\VariableTok{T}\NormalTok{.}\VariableTok{t}\NormalTok{(}\OperatorTok{:,}\FloatTok{1}\NormalTok{)}\OperatorTok{,:}\NormalTok{)}\OperatorTok{;}
+    \VariableTok{v} \OperatorTok{=}\NormalTok{ (}\VariableTok{d12}\NormalTok{(}\OperatorTok{:,}\FloatTok{1}\NormalTok{)}\OperatorTok{.*}\VariableTok{d13}\NormalTok{(}\OperatorTok{:,}\FloatTok{2}\NormalTok{)}\OperatorTok{{-}}\VariableTok{d12}\NormalTok{(}\OperatorTok{:,}\FloatTok{2}\NormalTok{)}\OperatorTok{.*}\VariableTok{d13}\NormalTok{(}\OperatorTok{:,}\FloatTok{1}\NormalTok{))}\OperatorTok{./}\FloatTok{2}\OperatorTok{;}
+\KeywordTok{end}
+\CommentTok{\% End of function computeArea}
+\end{Highlighting}
+\end{Shaded}
+
 
 \printbibliography
 
