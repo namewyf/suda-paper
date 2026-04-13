@@ -1,20 +1,24 @@
 h1:intro 摘要
 h1:chap-1 绪论
 h2:chap-1-1 研究背景与意义
+fig:fig1-1-fiber-network 纸张纤维网络多尺度结构示意
 h2:chap-1-2 多尺度数值计算方法综述
 h2:chap-1-3 局部正交分解（LOD）方法简介
 h2:chap-1-4 本文主要研究内容与结构安排
 h1:chap-2 椭圆型多尺度问题的数学描述
 h2:chap-2-1 模型问题定义
 h2:chap-2-2 标准有限元法的局限性
+fig:fig2-1-preasymptotic-fem 标准有限元法在预渐近区间的失效现象示意
 h2:chap-2-3 能量空间与有限元空间定义
 h1:chap-3 二维LOD方法的理论框架
 h2:chap-3-1 尺度的分解与拟插值算子
 fig:fig3-1-diffusion 扩散系数随机分布示意（图内标题为英文）
 h2:chap-3-2 -正交化与理想多尺度空间
+fig:fig2-12-basis-comparison 标准基函数与多尺度基函数形状对比
 h2:chap-3-3 理想LOD方法的误差分析
 h1:chap-4 数值校正子的局部化技术
 h2:chap-4-1 校正子的指数衰减特性
+fig:fig4-1-corrector-decay 局部校正函数的空间衰减示意（对数色标）
 h2:chap-4-2 局部化校正算子与单元补片（Patches）
 h2:chap-4-3 局部化正交分解方法（LOD）的离散格式
 h1:chap-5 算法设计与MATLAB程序实现
@@ -28,6 +32,7 @@ h2:chap-5-4 粗网格刚度矩阵的组装与求解
 h1:chap-6 数值算例与应用分析
 h2:chap-6-1 非周期高反差系数问题算例
 h2:chap-6-2 收敛性验证
+fig:fig5-1-convergence-curves 不同局部化层数下误差随粗网格尺度 $H$ 的收敛曲线
 h2:chap-6-3 结果可视化与解释
 fig:fig6-3-reference-solution 细网格参考解 $u_h$（$h=2^{-7.5}$）
 fig:fig6-3-lod-full LOD全近似解 $u_{H,\\ell}^{ms,h}$（$h=2^{-7.5}, H=2^{-1.5}, \\ell=1$）

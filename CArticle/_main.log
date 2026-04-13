@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999998 (TeX Live 2026) (preloaded format=xelatex 2026.4.13)  13 APR 2026 03:50
+This is XeTeX, Version 3.141592653-2.6-0.999998 (TeX Live 2026) (preloaded format=xelatex 2026.4.13)  13 APR 2026 09:19
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1351,7 +1351,7 @@ LaTeX Font Warning: Font shape `U/rsfs/m/n' in size <10.53937> not available
 
 LaTeX Font Info:    Font shape `TU/STSong(0)/b/n' will be
 (Font)              scaled to size 8.78397pt on input line 159.
-[2] [3] [4] [5] [6]
+[2]
 
 Package fontspec Info: 
 (fontspec)             Script 'CJK' not explicitly supported within font
@@ -1395,94 +1395,116 @@ Package fontspec Info:
 (fontspec)             <->s*[0.9707181870057879]"STFangsong/OT:script=hani;language=dflt;"
 
 LaTeX Font Info:    Font shape `TU/lmtt/bx/n' in size <10.53937> not available
-(Font)              Font shape `TU/lmtt/b/n' tried instead on input line 319.
+(Font)              Font shape `TU/lmtt/b/n' tried instead on input line 165.
+File: figures/fig1-1-fiber-network.png Graphic file (type bmp)
+<figures/fig1-1-fiber-network.png>
+[3] [4] [5]
+File: figures/fig2-1-preasymptotic-fem.png Graphic file (type bmp)
+<figures/fig2-1-preasymptotic-fem.png>
+[6] [7]
 File: figures/fig3-1-diffusion-coefficient.png Graphic file (type bmp)
 <figures/fig3-1-diffusion-coefficient.png>
-[7] [8] [9] [10] [11] [12] [13] [14]
+[8] [9]
+File: figures/fig2-12-basis-comparison.png Graphic file (type bmp)
+<figures/fig2-12-basis-comparison.png>
+[10]
+File: figures/fig4-1-corrector-decay.png Graphic file (type bmp)
+<figures/fig4-1-corrector-decay.png>
+[11] [12] [13] [14] [15] [16]
+File: figures/fig5-1-convergence-curves.png Graphic file (type bmp)
+<figures/fig5-1-convergence-curves.png>
+[17]
 File: figures/fig6-reference-solution.png Graphic file (type bmp)
 <figures/fig6-reference-solution.png>
 File: figures/fig6-lod-full-approximation.png Graphic file (type bmp)
 <figures/fig6-lod-full-approximation.png>
-[15] [16] [17]
 File: figures/fig6-lod-fe-part.png Graphic file (type bmp)
 <figures/fig6-lod-fe-part.png>
-[18] [19]
-Underfull \vbox (badness 10000) detected at line 1125
+[18] [19] [20] [21]
+Underfull \vbox (badness 10000) detected at line 1200
  []
 
 
-Underfull \vbox (badness 10000) detected at line 1125
- []
-
-[20]
-Underfull \vbox (badness 10000) detected at line 1125
- []
-
-
-Underfull \vbox (badness 10000) detected at line 1125
- []
-
-[21]
-Underfull \vbox (badness 10000) detected at line 1125
- []
-
-
-Underfull \vbox (badness 10000) detected at line 1125
+Underfull \vbox (badness 10000) detected at line 1200
  []
 
 [22]
-Underfull \vbox (badness 10000) detected at line 1125
+Underfull \vbox (badness 10000) detected at line 1200
  []
 
 
-Underfull \vbox (badness 10000) detected at line 1125
+Underfull \vbox (badness 10000) detected at line 1200
  []
 
 [23]
-Underfull \vbox (badness 10000) detected at line 1125
+Underfull \vbox (badness 10000) detected at line 1200
  []
 
 
-Underfull \vbox (badness 10000) detected at line 1125
+Underfull \vbox (badness 10000) detected at line 1200
  []
 
 [24]
-Underfull \vbox (badness 10000) detected at line 1125
+Underfull \vbox (badness 10000) detected at line 1200
  []
 
 
-Underfull \vbox (badness 10000) detected at line 1125
+Underfull \vbox (badness 10000) detected at line 1200
  []
 
 [25]
-Underfull \vbox (badness 10000) detected at line 1125
+Underfull \vbox (badness 10000) detected at line 1200
  []
 
 
-Underfull \vbox (badness 10000) detected at line 1125
+Underfull \vbox (badness 10000) detected at line 1200
  []
 
 [26]
-Underfull \vbox (badness 10000) detected at line 1125
+Underfull \vbox (badness 10000) detected at line 1200
  []
 
 
-Underfull \vbox (badness 10000) detected at line 1125
+Underfull \vbox (badness 10000) detected at line 1200
  []
 
 [27]
-Underfull \vbox (badness 10000) detected at line 1125
+Underfull \vbox (badness 10000) detected at line 1200
  []
 
 
-Underfull \vbox (badness 10000) detected at line 1125
+Underfull \vbox (badness 10000) detected at line 1200
  []
 
 [28]
+Underfull \vbox (badness 10000) detected at line 1200
+ []
 
-LaTeX Warning: Empty bibliography on input line 1128.
 
-[29] (./_main.aux)
+Underfull \vbox (badness 10000) detected at line 1200
+ []
+
+[29]
+Underfull \vbox (badness 10000) detected at line 1200
+ []
+
+
+Underfull \vbox (badness 10000) detected at line 1200
+ []
+
+[30]
+Underfull \vbox (badness 10000) detected at line 1200
+ []
+
+
+Underfull \vbox (badness 10000) detected at line 1200
+ []
+
+[31]
+
+LaTeX Warning: Empty bibliography on input line 1203.
+
+[32] (./_main.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2022/07/14>
@@ -1496,12 +1518,12 @@ Package logreq Info: Writing requests to '_main.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 28483 strings out of 470015
- 572375 string characters out of 5474702
- 1736825 words of memory out of 5000000
- 56846 multiletter control sequences out of 15000+600000
+ 28583 strings out of 470015
+ 576285 string characters out of 5474702
+ 1739034 words of memory out of 5000000
+ 56941 multiletter control sequences out of 15000+600000
  637035 words of font info for 130 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  90i,9n,134p,936b,5050s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on _main.pdf (29 pages).
+Output written on _main.pdf (32 pages).

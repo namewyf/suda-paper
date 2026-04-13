@@ -158,7 +158,22 @@
 
 \subsection{研究背景与意义}\label{chap-1-1}
 
-现代工程与科学计算中广泛存在一类具有多尺度特征的物理问题。复合材料的热传导、多孔介质中的流体渗流、纤维网络的弹性分析等应用场景，其材料属性往往在微观尺度上呈现出剧烈的非均匀性和高震荡特征。以图1.1所示的纸张纤维网络模型为例，宏观力学性能的准确预测依赖于对微观纤维构型信息的有效提取，这种跨尺度的信息传递对数值模拟方法提出了严峻挑战。
+现代工程与科学计算中广泛存在一类具有多尺度特征的物理问题。复合材料的热传导、多孔介质中的流体渗流、纤维网络的弹性分析等应用场景，其材料属性往往在微观尺度上呈现出剧烈的非均匀性和高震荡特征。以图\ref{fig:fig1-1-fiber-network}所示的纸张纤维网络模型为例，宏观力学性能的准确预测依赖于对微观纤维构型信息的有效提取，这种跨尺度的信息传递对数值模拟方法提出了严峻挑战。
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{knitr}\SpecialCharTok{::}\FunctionTok{include\_graphics}\NormalTok{(}\StringTok{"figures/fig1{-}1{-}fiber{-}network.png"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.72\linewidth]{figures/fig1-1-fiber-network} 
+
+}
+
+\caption{纸张纤维网络多尺度结构示意}\label{fig:fig1-1-fiber-network}
+\end{figure}
 
 从数学模型角度，这类问题通常归结为具有快速震荡系数的椭圆型偏微分方程：
 
@@ -241,7 +256,22 @@ A_\epsilon(x) = \left(2 + \cos\left(2\pi\frac{x}{\epsilon}\right)\right)^{-1}, \
 
 采用\(P_1\)有限元在均匀网格上求解该问题，网格尺寸\(h\)从\(2^{-1}\)逐步加密至\(2^{-7}\)。数值结果揭示了两个截然不同的收敛阶段。
 
-当\(h > \epsilon\)时，网格无法分辨系数的微观震荡。有限元解的局部平均效应使得扩散系数被隐式地替换为局部算术平均，而非正确的调和平均。如图2.1所示，这一阶段的有限元解不仅无法捕捉解的微观震荡特征，其宏观幅值也严重偏离真实解。有限元法陷入了''预渐近区间''，收敛性完全失效。
+当\(h > \epsilon\)时，网格无法分辨系数的微观震荡。有限元解的局部平均效应使得扩散系数被隐式地替换为局部算术平均，而非正确的调和平均。如图\ref{fig:fig2-1-preasymptotic-fem}所示，这一阶段的有限元解不仅无法捕捉解的微观震荡特征，其宏观幅值也严重偏离真实解。有限元法陷入了''预渐近区间''，收敛性完全失效。
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{knitr}\SpecialCharTok{::}\FunctionTok{include\_graphics}\NormalTok{(}\StringTok{"figures/fig2{-}1{-}preasymptotic{-}fem.png"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.72\linewidth]{figures/fig2-1-preasymptotic-fem} 
+
+}
+
+\caption{标准有限元法在预渐近区间的失效现象示意}\label{fig:fig2-1-preasymptotic-fem}
+\end{figure}
 
 只有当\(h \ll \epsilon\)时，网格能够逐点解析系数变化，有限元解才开始呈现出标准的二次收敛行为。从预渐近区间到渐近区间的转变以\(h \approx \epsilon\)为特征尺度。在许多实际多尺度问题中，\(\epsilon\)通常极其微小，使得渐近区间的到达需要天文数字的计算自由度，这在工程实践中往往无法实现。
 
@@ -363,7 +393,22 @@ V_H^{\mathrm{ms}} = (1 - \mathcal{C})V_H.
 \Lambda_z^{\mathrm{ms}} := (1 - \mathcal{C})\Lambda_z, \quad z \in \mathcal{N}_H^{\mathrm{int}}.
 \]
 
-这些多尺度基函数保留了标准基函数的Lagrange性质，即\(\Lambda_z^{\mathrm{ms}}(y) = \delta_{zy}\)，但其形状能够自动适应扩散系数\(A\)的局部变化。图2.12展示了校正前后基函数的显著差异：标准基函数是光滑的帽函数，而多尺度基函数在微观尺度上呈现出与\(A\)相同的震荡模式。
+这些多尺度基函数保留了标准基函数的Lagrange性质，即\(\Lambda_z^{\mathrm{ms}}(y) = \delta_{zy}\)，但其形状能够自动适应扩散系数\(A\)的局部变化。图\ref{fig:fig2-12-basis-comparison}展示了校正前后基函数的显著差异：标准基函数是光滑的帽函数，而多尺度基函数在微观尺度上呈现出与\(A\)相同的震荡模式。
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{knitr}\SpecialCharTok{::}\FunctionTok{include\_graphics}\NormalTok{(}\StringTok{"figures/fig2{-}12{-}basis{-}comparison.png"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.72\linewidth]{figures/fig2-12-basis-comparison} 
+
+}
+
+\caption{标准基函数与多尺度基函数形状对比}\label{fig:fig2-12-basis-comparison}
+\end{figure}
 
 \subsection{理想LOD方法的误差分析}\label{chap-3-3}
 
@@ -410,7 +455,22 @@ a(\phi, w) = \int_T (A\nabla v) \cdot \nabla w \, \mathrm{d}x, \quad \forall w \
 \|A^{1/2}\nabla \phi\|_{L^2(\Omega \setminus \mathsf{N}^\ell(T))} \leq \sqrt{2} \exp\left(-c\frac{\alpha}{\beta}\ell\right) \|A^{1/2}\nabla v\|_{L^2(T)}.
 \]
 
-定理的证明基于能量方法和适当的截断函数技巧。其核心物理直观是：椭圆算子的Green函数在异质介质中虽然呈现复杂的局部震荡，但其''宏观包络''仍以指数速率衰减。图4.1以对数色标展示了校正函数的快速空间衰减行为，与理论预测高度吻合。
+定理的证明基于能量方法和适当的截断函数技巧。其核心物理直观是：椭圆算子的Green函数在异质介质中虽然呈现复杂的局部震荡，但其''宏观包络''仍以指数速率衰减。图\ref{fig:fig4-1-corrector-decay}以对数色标展示了校正函数的快速空间衰减行为，与理论预测高度吻合。
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{knitr}\SpecialCharTok{::}\FunctionTok{include\_graphics}\NormalTok{(}\StringTok{"figures/fig4{-}1{-}corrector{-}decay.png"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.72\linewidth]{figures/fig4-1-corrector-decay} 
+
+}
+
+\caption{局部校正函数的空间衰减示意（对数色标）}\label{fig:fig4-1-corrector-decay}
+\end{figure}
 
 \subsection{局部化校正算子与单元补片（Patches）}\label{chap-4-2}
 
@@ -663,7 +723,22 @@ S_{\mathrm{ph}} & \mathrm{IHp}^T \\
 
 \subsection{收敛性验证}\label{chap-6-2}
 
-图5.1展示了能量模和\(L^2\)模误差随\(H\)的衰减曲线。标准有限元法（黑色虚线）在\(H\)较大时完全失效，误差始终保持在\(\mathcal{O}(1)\)水平。LOD方法当\(\ell\)足够大时（如\(\ell \geq 3\)）呈现清晰的线性（\(H^1\)模）和二次（\(L^2\)模）收敛，且误差常数与理论预测一致。当\(\ell\)较小时，收敛曲线在某一\(H\)阈值后趋于水平，反映了局部化误差开始主导。
+图\ref{fig:fig5-1-convergence-curves}展示了能量模和\(L^2\)模误差随\(H\)的衰减曲线。标准有限元法（黑色虚线）在\(H\)较大时完全失效，误差始终保持在\(\mathcal{O}(1)\)水平。LOD方法当\(\ell\)足够大时（如\(\ell \geq 3\)）呈现清晰的线性（\(H^1\)模）和二次（\(L^2\)模）收敛，且误差常数与理论预测一致。当\(\ell\)较小时，收敛曲线在某一\(H\)阈值后趋于水平，反映了局部化误差开始主导。
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{knitr}\SpecialCharTok{::}\FunctionTok{include\_graphics}\NormalTok{(}\StringTok{"figures/fig5{-}1{-}convergence{-}curves.png"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.72\linewidth]{figures/fig5-1-convergence-curves} 
+
+}
+
+\caption{不同局部化层数下误差随粗网格尺度 $H$ 的收敛曲线}\label{fig:fig5-1-convergence-curves}
+\end{figure}
 
 值得注意的是，即使取\(\ell = 0\)（仅在一个单元内校正），LOD解的有限元部分\(u_{H,\ell,h}\)在\(L^2\)模下仍能逼近\(V_H\)中的最佳逼近，表明方法对参数选择具有一定鲁棒性。
 
