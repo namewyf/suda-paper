@@ -117,6 +117,22 @@
 \geometry{%
   left=2.0cm, right=2.0cm, top=3.5cm, bottom=2.5cm} 
 
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[C]{苏州大学本科生毕业设计（论文）}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+\fancypagestyle{plain}{
+  \fancyhf{}
+  \fancyhead[C]{苏州大学本科生毕业设计（论文）}
+  \fancyfoot[C]{\thepage}
+  \renewcommand{\headrulewidth}{0pt}
+  \renewcommand{\footrulewidth}{0pt}
+}
+\setlength{\headheight}{15pt}
+
 \usepackage{amsthm,mathrsfs}
 \usepackage{booktabs}
 \usepackage{longtable}
@@ -130,17 +146,13 @@
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
 \urlstyle{same}
 \hypersetup{
-  pdftitle={二维多尺度问题正交分解方法及其程序实现},
-  pdfauthor={李东风},
   hidelinks,
   pdfcreator={LaTeX via pandoc}}
 
-\title{二维多尺度问题正交分解方法及其程序实现}
-\author{李东风}
-\date{2030年6月5日}
+\author{}
+\date{\vspace{-2.5em}}
 
 \begin{document}
-\maketitle
 
 {
 \setcounter{tocdepth}{2}

@@ -1,7 +1,4 @@
 ---
-title: "二维多尺度问题正交分解方法及其程序实现"
-author: "李东风"
-date: "2030年6月5日"
 site: bookdown::bookdown_site
 documentclass: article
 bibliography: [mybib.bib]
