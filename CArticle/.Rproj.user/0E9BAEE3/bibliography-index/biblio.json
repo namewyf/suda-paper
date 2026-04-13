@@ -3,107 +3,199 @@
         {
             "author": [
                 {
-                    "family": "茆诗松"
+                    "family": "Målqvist",
+                    "given": "Axel"
                 },
                 {
-                    "family": "王静龙"
-                },
-                {
-                    "family": "濮晓龙"
+                    "family": "Peterseim",
+                    "given": "Daniel"
                 }
             ],
-            "edition": "第二版",
-            "id": "MWP06-HighStat",
+            "collection-title": "SIAM spotlights",
+            "id": "malqvist2021numerical",
             "issued": {
                 "date-parts": [
                     [
-                        2006
+                        2021
                     ]
                 ]
             },
-            "publisher": "高等教育出版社",
-            "title": "高等数理统计",
-            "type": "book"
+            "publisher": "SIAM",
+            "publisher-place": "Philadelphia",
+            "title": "Numerical homogenization by localized orthogonal decomposition",
+            "type": "book",
+            "volume": "5"
         },
         {
             "author": [
                 {
-                    "family": "Unwin",
-                    "given": "Antony"
+                    "family": "Målqvist",
+                    "given": "Axel"
                 },
                 {
-                    "family": "Theus",
-                    "given": "Martin"
-                },
-                {
-                    "family": "Hofmann",
-                    "given": "Heike"
+                    "family": "Peterseim",
+                    "given": "Daniel"
                 }
             ],
-            "id": "Unwin-Visualize06",
+            "container-title": "Mathematics of Computation",
+            "id": "malqvist2014localization",
+            "issue": "290",
             "issued": {
                 "date-parts": [
                     [
-                        2006
+                        2014
                     ]
                 ]
             },
-            "publisher": "Springer",
-            "title": "Graphics of large datasets visualizing a million",
-            "type": "book"
-        },
-        {
-            "author": [
-                {
-                    "family": "Wichmann",
-                    "given": "B. A."
-                },
-                {
-                    "family": "Hill",
-                    "given": "I. D."
-                }
-            ],
-            "container-title": "Applied Statistics",
-            "id": "Wichmann1982:RNG",
-            "issued": {
-                "date-parts": [
-                    [
-                        1982
-                    ]
-                ]
-            },
-            "page": "188-190. Remarks: 34, 198 and 35, 89",
-            "title": "Algorithm as 183: An efficient and portable pseudo-random number generator",
-            "title-short": "Algorithm as 183",
+            "page": "2583-2603",
+            "title": "Localization of elliptic multiscale problems",
             "type": "article-journal",
-            "volume": "31"
+            "volume": "83"
         },
         {
             "author": [
                 {
-                    "family": "钱敏平"
+                    "family": "Henning",
+                    "given": "Patrick"
                 },
                 {
-                    "family": "龚光鲁"
-                },
-                {
-                    "family": "陈大岳"
-                },
-                {
-                    "family": "章复熹"
+                    "family": "Peterseim",
+                    "given": "Daniel"
                 }
             ],
-            "id": "QGCZ2011:StochProc",
+            "container-title": "Multiscale Modeling & Simulation",
+            "id": "henning2013oversampling",
+            "issue": "4",
             "issued": {
                 "date-parts": [
                     [
-                        2011
+                        2013
                     ]
                 ]
             },
-            "publisher": "高等教育出版社",
-            "title": "应用随机过程",
-            "type": "book"
+            "page": "1149-1175",
+            "title": "Oversampling for the multiscale finite element method",
+            "type": "article-journal",
+            "volume": "11"
+        },
+        {
+            "author": [
+                {
+                    "family": "Gallistl",
+                    "given": "Dietmar"
+                },
+                {
+                    "family": "Peterseim",
+                    "given": "Daniel"
+                }
+            ],
+            "container-title": "Multiscale Modeling & Simulation",
+            "id": "gallistl2017quasilocal",
+            "issue": "4",
+            "issued": {
+                "date-parts": [
+                    [
+                        2017
+                    ]
+                ]
+            },
+            "page": "1530-1552",
+            "title": "Computation of quasi-local effective diffusion tensors and connections to the mathematical theory of homogenization",
+            "type": "article-journal",
+            "volume": "15"
+        },
+        {
+            "author": [
+                {
+                    "family": "Engwer",
+                    "given": "Christian"
+                },
+                {
+                    "family": "Henning",
+                    "given": "Patrick"
+                },
+                {
+                    "family": "Målqvist",
+                    "given": "Axel"
+                },
+                {
+                    "family": "Peterseim",
+                    "given": "Daniel"
+                }
+            ],
+            "container-title": "Computer Methods in Applied Mechanics and Engineering",
+            "id": "engwer2019efficient",
+            "issued": {
+                "date-parts": [
+                    [
+                        2019
+                    ]
+                ]
+            },
+            "page": "123-153",
+            "title": "Efficient implementation of the localized orthogonal decomposition method",
+            "type": "article-journal",
+            "volume": "350"
+        },
+        {
+            "author": [
+                {
+                    "family": "Hughes",
+                    "given": "Thomas J. R."
+                },
+                {
+                    "family": "Feijóo",
+                    "given": "Guillermo R."
+                },
+                {
+                    "family": "Mazzei",
+                    "given": "Luca"
+                },
+                {
+                    "family": "Quincy",
+                    "given": "Jean-Baptiste"
+                }
+            ],
+            "container-title": "Computer Methods in Applied Mechanics and Engineering",
+            "id": "hughes1998variational",
+            "issue": "1-2",
+            "issued": {
+                "date-parts": [
+                    [
+                        1998
+                    ]
+                ]
+            },
+            "page": "3-24",
+            "title": "The variational multiscale method—a paradigm for computational mechanics",
+            "type": "article-journal",
+            "volume": "166"
+        },
+        {
+            "author": [
+                {
+                    "family": "Kornhuber",
+                    "given": "Ralf"
+                },
+                {
+                    "family": "Yserentant",
+                    "given": "Harry"
+                }
+            ],
+            "container-title": "Multiscale Modeling & Simulation",
+            "id": "kornhuber2016numerical",
+            "issue": "3",
+            "issued": {
+                "date-parts": [
+                    [
+                        2016
+                    ]
+                ]
+            },
+            "page": "1017-1036",
+            "title": "Numerical homogenization of elliptic multiscale problems by subspace decomposition",
+            "type": "article-journal",
+            "volume": "14"
         }
     ],
     "project_biblios": [
