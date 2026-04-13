@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999998 (TeX Live 2026) (preloaded format=xelatex 2026.4.13)  13 APR 2026 09:19
+This is XeTeX, Version 3.141592653-2.6-0.999998 (TeX Live 2026) (preloaded format=xelatex 2026.4.13)  13 APR 2026 09:41
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1404,23 +1404,40 @@ File: figures/fig2-1-preasymptotic-fem.png Graphic file (type bmp)
 [6] [7]
 File: figures/fig3-1-diffusion-coefficient.png Graphic file (type bmp)
 <figures/fig3-1-diffusion-coefficient.png>
-[8] [9]
+[8]
 File: figures/fig2-12-basis-comparison.png Graphic file (type bmp)
 <figures/fig2-12-basis-comparison.png>
-[10]
+[9] [10]
 File: figures/fig4-1-corrector-decay.png Graphic file (type bmp)
 <figures/fig4-1-corrector-decay.png>
-[11] [12] [13] [14] [15] [16]
+[11] [12] [13] [14] [15]
 File: figures/fig5-1-convergence-curves.png Graphic file (type bmp)
 <figures/fig5-1-convergence-curves.png>
-[17]
+[16]
 File: figures/fig6-reference-solution.png Graphic file (type bmp)
 <figures/fig6-reference-solution.png>
+[17]
 File: figures/fig6-lod-full-approximation.png Graphic file (type bmp)
 <figures/fig6-lod-full-approximation.png>
 File: figures/fig6-lod-fe-part.png Graphic file (type bmp)
 <figures/fig6-lod-fe-part.png>
-[18] [19] [20] [21]
+[18] [19]
+Underfull \vbox (badness 10000) detected at line 1200
+ []
+
+
+Underfull \vbox (badness 10000) detected at line 1200
+ []
+
+[20]
+Underfull \vbox (badness 10000) detected at line 1200
+ []
+
+
+Underfull \vbox (badness 10000) detected at line 1200
+ []
+
+[21]
 Underfull \vbox (badness 10000) detected at line 1200
  []
 
@@ -1485,26 +1502,10 @@ Underfull \vbox (badness 10000) detected at line 1200
  []
 
 [29]
-Underfull \vbox (badness 10000) detected at line 1200
- []
-
-
-Underfull \vbox (badness 10000) detected at line 1200
- []
-
-[30]
-Underfull \vbox (badness 10000) detected at line 1200
- []
-
-
-Underfull \vbox (badness 10000) detected at line 1200
- []
-
-[31]
 
 LaTeX Warning: Empty bibliography on input line 1203.
 
-[32] (./_main.aux)
+[30] (./_main.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2022/07/14>
@@ -1520,10 +1521,10 @@ Package logreq Info: Writing requests to '_main.run.xml'.
 Here is how much of TeX's memory you used:
  28583 strings out of 470015
  576285 string characters out of 5474702
- 1739034 words of memory out of 5000000
+ 1734033 words of memory out of 5000000
  56941 multiletter control sequences out of 15000+600000
  637035 words of font info for 130 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  90i,9n,134p,936b,5050s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on _main.pdf (32 pages).
+Output written on _main.pdf (30 pages).

@@ -213,7 +213,7 @@ v = \mathcal{I}_H v + (1 - \mathcal{I}_H)v, \quad \mathcal{I}_H v \in V_H, \ (1 
 
 这一分解在$H^1$范数下是稳定的。图\@ref(fig:fig3-1-diffusion)展示了典型多尺度解的尺度分解效果：粗尺度部分$\mathcal{I}_H u$捕捉了解的宏观趋势，而细尺度部分$(1 - \mathcal{I}_H)u$包含了所有微观震荡信息。
 
-```{r fig3-1-diffusion, fig.cap='扩散系数随机分布示意（图内标题为英文）', fig.align='center', out.width='72%'}
+```{r fig3-1-diffusion, fig.cap='扩散系数随机分布示意（图内标题为英文）', fig.align='center', out.width='56%'}
 knitr::include_graphics("figures/fig3-1-diffusion-coefficient.png")
 ```
 
@@ -545,15 +545,15 @@ knitr::include_graphics("figures/fig5-1-convergence-curves.png")
 
 图\@ref(fig:fig6-3-reference-solution)、图\@ref(fig:fig6-3-lod-full)与图\@ref(fig:fig6-3-lod-fe-part)分别展示了细网格参考解、LOD全近似解和LOD近似解中的有限元部分。可以看到，LOD全近似解在整体形貌和局部震荡特征上与参考解高度一致；而有限元部分主要反映宏观包络信息。这一直观对比说明，LOD通过多尺度基函数把细尺度信息有效编码到粗尺度离散空间中。
 
-```{r fig6-3-reference-solution, fig.cap='细网格参考解 $u_h$（$h=2^{-7.5}$）', fig.align='center', out.width='72%'}
+```{r fig6-3-reference-solution, fig.cap='细网格参考解 $u_h$（$h=2^{-7.5}$）', fig.align='center', out.width='56%'}
 knitr::include_graphics("figures/fig6-reference-solution.png")
 ```
 
-```{r fig6-3-lod-full, fig.cap='LOD全近似解 $u_{H,\\ell}^{ms,h}$（$h=2^{-7.5}, H=2^{-1.5}, \\ell=1$）', fig.align='center', out.width='72%'}
+```{r fig6-3-lod-full, fig.cap='LOD全近似解 $u_{H,\\ell}^{ms,h}$（$h=2^{-7.5}, H=2^{-1.5}, \\ell=1$）', fig.align='center', out.width='56%'}
 knitr::include_graphics("figures/fig6-lod-full-approximation.png")
 ```
 
-```{r fig6-3-lod-fe-part, fig.cap='LOD近似解中的有限元部分 $u_{H,\\ell}^{h}$（$h=2^{-7.5}, H=2^{-1.5}, \\ell=1$）', fig.align='center', out.width='72%'}
+```{r fig6-3-lod-fe-part, fig.cap='LOD近似解中的有限元部分 $u_{H,\\ell}^{h}$（$h=2^{-7.5}, H=2^{-1.5}, \\ell=1$）', fig.align='center', out.width='52%'}
 knitr::include_graphics("figures/fig6-lod-fe-part.png")
 ```
 
